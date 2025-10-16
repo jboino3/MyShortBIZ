@@ -1,0 +1,17 @@
+# macOS
+.DS_Store
+
+# VS Code
+.vscode/
+
+# Python
+server/.venv/
+__pycache__/
+*.pyc
+
+# Node
+client/node_modules/
+client/dist/
+
+# Env
+**/.env
