@@ -1,10 +1,10 @@
 import { Outlet } from 'react-router-dom'
-import Sidebar from './Header'
+import Header from './Header'
 
 const Layout = () => {
   return (
     <div className="App">
-      <Sidebar />
+      <Header />
       <div className="page">
         <Outlet />
       </div>

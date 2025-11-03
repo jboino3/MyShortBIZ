@@ -1,36 +1,59 @@
 import './style.scss'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+import logo from '../assets/logo.png.png'
+import Dropdown from 'react-bootstrap/Dropdown'
+{/* <FontAwesomeIcon icon={faHome} color="#4d4d4e" /> */ }
+export function scrollToRef<T extends HTMLElement = HTMLElement>(
+  ref: React.RefObject<T> | null | undefined,
+  options?: ScrollIntoViewOptions
+): boolean {
+  const el = ref?.current;
+  if (el && typeof el.scrollIntoView === 'function') {
+    try {
+      el.scrollIntoView(options ?? { behavior: 'smooth' });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  return false;
+}
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {
-  faLinkedin,
-  faGithub,
-} from '@fortawesome/free-brands-svg-icons'
-import {
-  faHome,
-  faUser,
-  faEnvelope,
-  faSuitcase,
-} from '@fortawesome/free-solid-svg-icons'
-import { NavLink } from 'react-router-dom'
-{/* <FontAwesomeIcon icon={faHome} color="#4d4d4e" /> */}
 const Sidebar = () => {
   const [showNav, setShowNav] = useState(false);
-
+const aboutUsRef = useRef(null);
+const featuresRef = useRef(null);
+const solutionsRef = useRef(null);
+const pricingRef = useRef(null);
+const resourcesRef = useRef(null);
+const contactRef = useRef(null);
   return (
     <div className="nav-bar">
-      <nav className={showNav ? 'mobile-show' : ''}>
-        <NavLink to="/" onClick={() => setShowNav(false)}> home </NavLink>
-        <NavLink to="/bio" onClick={() => setShowNav(false)}> bio </NavLink>
-        <NavLink to="/blog" onClick={() => setShowNav(false)}> blog </NavLink>
-        <NavLink to="/cv" onClick={() => setShowNav(false)}> cv </NavLink>
-        <NavLink to="/link" onClick={() => setShowNav(false)}> link </NavLink>
-        <NavLink to="/shop" onClick={() => setShowNav(false)}> shop </NavLink>
-        <NavLink to="/social" onClick={() => setShowNav(false)}> social </NavLink>
-        <NavLink to="/store" onClick={() => setShowNav(false)}> store </NavLink>
-        <NavLink to="/studio" onClick={() => setShowNav(false)}> studio </NavLink>
-        <NavLink to="/interactive" onClick={() => setShowNav(false)}> interactive </NavLink>
-        <NavLink to="/video" onClick={() => setShowNav(false)}> video </NavLink>
+      <button>Sign in</button>
+      <button>Register</button>
+      <button>Settings</button>
+      <button>Help & Contact</button>
+      <img src={logo} className='logo' />
+      <nav className='header'>
+        <section className='dropdowns'>
+          <button>about us</button>
+          <Dropdown>
+            <Dropdown.Toggle variant="success" id="dropdown-basic">
+              features
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
+              <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
+              <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </section>
+        <section className='aboutus-section' ref={aboutUsRef}></section>
+        <section className='features-section' ref={featuresRef}></section>
+        <section className='solutions-section' ref={solutionsRef}></section>
+        <section className='pricing-section' ref={pricingRef}></section>
+        <section className='resources-section' ref={resourcesRef}></section>
+        <section className='contact-section' ref={contactRef}></section>
       </nav>
     </div>
   )
