@@ -1,61 +1,128 @@
-.nav-bar {
-  background-color: white;
-  width: 100%;
-  height: 20%;
-  top: 0%;
-  justify-content: right;
+// .nav-bar {
+//     background-color: white;
+//     width: 100%;
+//     height: 20%;
+//     top: 0%;
+//     justify-content: right;
 
-  .header {
-    color: #ff0000;
-    justify-content: right;
-    display: flex;
-  }
+//     .header {
+//         color: #ff0000;
+//         justify-content: right;
+//         display: flex;
+//     }
 
-  .dropdowns {
-    display: flex;
-    > button {
-      font: inherit;
-      gap: 0.5rem;
-      color: black;
-      background: initial;
-      border: initial;
-      padding: 0.5rem 0.8rem;
-      -webkit-tap-highlight-color: transparent;
-      &:active {
-        /* don't change background or shadow on hover/click */
-        background: none;
-        box-shadow: none;
-      }
-    }
+//     .dropdowns {
+//         display: flex;
 
-    /* React-Bootstrap dropdown toggle — remove visible click/hover highlighting */
-    .dropdown-toggle {
-      color: #000; /* black text */
-      background: transparent; /* transparent background */
-      border: none;
-      padding: 0.5rem 0.8rem;      
-      &:active{
-        background: transparent !important;
-        color: black;
-      }
-    }
+//         >button {
+//             font: inherit;
+//             color: black;
+//             background: initial;
+//             border: initial;
+//             padding: 0.5rem 0.8rem;
+//             -webkit-tap-highlight-color: transparent;
+//         }
 
-    /* Dropdown menu and items — remove selection and active highlighting */
-    .dropdown-menu {
-      background: orange;
-      border: none;
-      box-shadow: none;
-      padding: 0.25rem 0;
-      min-width: auto;
-    }
-  }
-}
+//         /* React-Bootstrap dropdown toggle — remove visible click/hover highlighting */
+//         .dropdown-toggle {
+//             color: #000;
+//             /* black text */
+//             background: transparent;
+//             /* transparent background */
+//             border: none;
+//             padding: 0.5rem 0.8rem;
 
-.logo {
-  display: flex;
-  overflow: hidden;
-}
-//this can be used as stuff we want for the template
-.App {
-  background-color: #F1D0FF;
-}
+//             &:active {
+//                 background: transparent !important;
+//                 color: black;
+//             }
+//         }
+
+//         /* Dropdown menu and items — remove selection and active highlighting */
+//         .dropdown-menu {
+//             background: orange;
+//             border: none;
+//             box-shadow: none;
+//             padding: 0.25rem 0;
+//             min-width: auto;
+//         }
+//     }
+// }
+// .logo {
+//     display: flex;
+//     overflow: hidden;
+// }
+// .aboutus-section {
+//     background: red;
+//     position: absolute;
+//     width: 100%;
+//     height: 100%;
+//     top: 100%;
+// }
+// .features-section {
+//     background: orange;
+//     position: absolute;
+//     width: 100%;
+//     height: 100%;
+//     top: 200%;
+// }
+// .solutions-section {
+//     background: yellow;
+//     position: absolute;
+//     width: 100%;
+//     height: 100%;
+//     top: 300%;
+// }
+// .pricing-section {
+//     background: green;
+//     position: absolute;
+//     width: 100%;
+//     height: 100%;
+//     top: 400%;
+// }
+// .resources-section {
+//     background: blue;
+//     position: absolute;
+//     width: 100%;
+//     height: 100%;
+//     top: 500%;
+// }
+// .contact-section {
+//     background: purple;
+//     position: absolute;
+//     width: 100%;
+//     height: 100%;
+//     top: 600%;
+// }
+// //this can be used as stuff we want for the template
+// .App {
+//     background-color: #F1D0FF;
+// } 
+// html, body {
+//   height: 100%;
+//   margin: 0;
+//   padding: 0;
+//   overflow-y: auto; // allow vertical scrolling
+//   overflow-x: hidden; // prevent horizontal scrollbar
+//   scroll-behavior: smooth;
+// }
+
+// /* Hide scrollbar for all browsers */
+// body::-webkit-scrollbar {
+//   display: none; /* Chrome, Safari, Edge */
+// }
+
+// body {
+//   -ms-overflow-style: none;  /* IE and Edge Legacy */
+//   scrollbar-width: none;     /* Firefox */
+// }
+
+// /* Optional: hide scrollbar inside nav or sections if they ever scroll */
+// .nav-bar, nav, section {
+//   -ms-overflow-style: none;
+//   scrollbar-width: none;
+
+//   &::-webkit-scrollbar {
+//     display: none;
+//   }
+// }

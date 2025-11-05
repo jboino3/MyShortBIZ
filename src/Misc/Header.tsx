@@ -1,62 +1,77 @@
-import './style.scss'
-import { useState, useRef } from 'react'
-import logo from '../assets/logo.png.png'
-import Dropdown from 'react-bootstrap/Dropdown'
-{/* <FontAwesomeIcon icon={faHome} color="#4d4d4e" /> */ }
-export function scrollToRef<T extends HTMLElement = HTMLElement>(
-  ref: React.RefObject<T> | null | undefined,
-  options?: ScrollIntoViewOptions
-): boolean {
-  const el = ref?.current;
-  if (el && typeof el.scrollIntoView === 'function') {
-    try {
-      el.scrollIntoView(options ?? { behavior: 'smooth' });
-      return true;
-    } catch {
-      return false;
-    }
-  }
-  return false;
-}
+// // Header.tsx
+// import React, { useState, useRef, RefObject } from 'react';
+// import './style.scss';
+// import logo from '../assets/logo.png.png';
+// import Dropdown from 'react-bootstrap/Dropdown';
 
-const Sidebar = () => {
-  const [showNav, setShowNav] = useState(false);
-const aboutUsRef = useRef(null);
-const featuresRef = useRef(null);
-const solutionsRef = useRef(null);
-const pricingRef = useRef(null);
-const resourcesRef = useRef(null);
-const contactRef = useRef(null);
-  return (
-    <div className="nav-bar">
-      <button>Sign in</button>
-      <button>Register</button>
-      <button>Settings</button>
-      <button>Help & Contact</button>
-      <img src={logo} className='logo' />
-      <nav className='header'>
-        <section className='dropdowns'>
-          <button>about us</button>
-          <Dropdown>
-            <Dropdown.Toggle variant="success" id="dropdown-basic">
-              features
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-              <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
-              <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
-              <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
-        </section>
-        <section className='aboutus-section' ref={aboutUsRef}></section>
-        <section className='features-section' ref={featuresRef}></section>
-        <section className='solutions-section' ref={solutionsRef}></section>
-        <section className='pricing-section' ref={pricingRef}></section>
-        <section className='resources-section' ref={resourcesRef}></section>
-        <section className='contact-section' ref={contactRef}></section>
-      </nav>
-    </div>
-  )
-}
+// // FontAwesome (kept as a plain JS comment here)
+// // import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+// // /* <FontAwesomeIcon icon={faHome} color="#4d4d4e" /> */
 
-export default Sidebar
+// export function scrollToRef<T extends HTMLElement = HTMLElement>(
+//   ref: RefObject<T> | null | undefined,
+//   options?: ScrollIntoViewOptions
+// ): boolean {
+//   const el = ref?.current;
+//   if (el && typeof el.scrollIntoView === 'function') {
+//     try {
+//       el.scrollIntoView(options ?? { behavior: 'smooth' });
+//       return true;
+//     } catch {
+//       return false;
+//     }
+//   }
+//   return false;
+// }
+function Sidebar(){}
+// const Sidebar: React.FC = () => {
+//   const [showNav, setShowNav] = useState(false);
+
+//   // typed refs
+//   const aboutUsRef = useRef<HTMLElement | null>(null);
+//   const featuresRef = useRef<HTMLElement | null>(null);
+//   const solutionsRef = useRef<HTMLElement | null>(null);
+//   const pricingRef = useRef<HTMLElement | null>(null);
+//   const resourcesRef = useRef<HTMLElement | null>(null);
+//   const contactRef = useRef<HTMLElement | null>(null);
+
+//   return (
+//     <div className="nav-bar">
+//       <button>Sign in</button>
+//       <button>Register</button>
+//       <button>Settings</button>
+//       <button>Help &amp; Contact</button>
+
+//       {/* image should include alt for accessibility */}
+//       <img src={logo} className="logo" alt="logo" />
+
+//       <nav className="header">
+//         <section className="dropdowns">
+//           {/* pass a function to onClick instead of calling it immediately */}
+//           <button onClick={() => scrollToRef(aboutUsRef)}>about us</button>
+
+//           <Dropdown>
+//             <Dropdown.Toggle variant="success" id="dropdown-basic">
+//               features
+//             </Dropdown.Toggle>
+//             <Dropdown.Menu>
+//               <Dropdown.Item href="">Action</Dropdown.Item>
+//               <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
+//               <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
+//             </Dropdown.Menu>
+//           </Dropdown>
+//         </section>
+
+//         {/* sections that we'll scroll to */}
+//         <section className="aboutus-section" ref={aboutUsRef}></section>
+//         <section className="features-section" ref={featuresRef}></section>
+//         <section className="solutions-section" ref={solutionsRef}></section>
+//         <section className="pricing-section" ref={pricingRef}></section>
+//         <section className="resources-section" ref={resourcesRef}></section>
+//         <section className="contact-section" ref={contactRef}></section>
+//       </nav>
+//     </div>
+//   );
+// };
+
+export default Sidebar;
