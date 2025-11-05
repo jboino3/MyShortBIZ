@@ -35,13 +35,11 @@ body {
   background-color: inherit; /* use :root background color */
   color: inherit;
   overflow: auto;
+    -ms-overflow-style: none;  /* IE and Edge Legacy */
+  scrollbar-width: none;     /* Firefox */
 }
-
-#root {
-  /* let the React root grow/shrink to fill the viewport */
-  /* flex: 1 1 auto; */
-  /* display: flex; */
-  /* flex-direction: column; */
+body::-webkit-scrollbar {
+  display: none;
 }
 
 /* Your link styles */
