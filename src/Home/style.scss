@@ -1,137 +1,130 @@
-.nav-bar {
-    background-color: white;
-    width: 100%;
-    height: 20%;
-    top: 0%;
-    justify-content: right;
-
-    .header {
-        color: #ff0000;
-        justify-content: right;
-        display: flex;
-        position: fixed;
-        z-index: 100;
-        background-color: white;
-        width: 100%;
-        height: 15%;
-        top: 0%;
-    }
-
-    .dropdowns {
-        display: flex;
-
-        >button {
-            font: inherit;
-            color: black;
-            background: initial;
-            border: initial;
-            padding: 0.5rem 0.8rem;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        /* React-Bootstrap dropdown toggle — remove visible click/hover highlighting */
-        .dropdown-toggle {
-            color: #000;
-            /* black text */
-            background: transparent;
-            /* transparent background */
-            border: none;
-            padding: 0.5rem 0.8rem;
-
-            &:active {
-                background: transparent !important;
-                color: black;
-            }
-        }
-
-        /* Dropdown menu and items — remove selection and active highlighting */
-        .dropdown-menu {
-            background: orange;
-            border: none;
-            box-shadow: none;
-            padding: 0.25rem 0;
-            min-width: auto;
-        }
-    }
+/* Global */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 }
 
-.logo {
+/* Hide scrollbars (optional) */
+body::-webkit-scrollbar { display: none; }
+body { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Top utility bar */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  height: 36px;
+  background: #ffffff;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+
+  .topbar__left,
+  .topbar__right {
     display: flex;
-    overflow: hidden;
-}
+    gap: 12px;
+  }
 
-.aboutus-section {
-    background: red;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 100%;
-}
+  .topbar__left {
+    margin-right: auto; /* pushes right group to the far right */
+  }
+  .topbar__right {
+    margin-left: auto;
+  }
 
-.features-section {
-    background: orange;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 200%;
-}
-
-.solutions-section {
-    background: yellow;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 300%;
-}
-
-.pricing-section {
-    background: green;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 400%;
-}
-
-.resources-section {
-    background: blue;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 500%;
-}
-
-.contact-section {
-    background: purple;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 600%;
-}
-
-//this can be used as stuff we want for the template
-.App {
-    background-color: #F1D0FF;
-}
-
-html,
-body {
-    height: 100%;
-    margin: 0;
+  .linklike {
+    font: inherit;
+    font-size: 0.85rem;
+    color: #111;
+    background: transparent;
+    border: none;
     padding: 0;
-    overflow-y: auto; // allow vertical scrolling
-    overflow-x: hidden; // prevent horizontal scrollbar
-    scroll-behavior: smooth;
+    cursor: pointer;
+  }
 }
 
-/* Hide scrollbar for all browsers */
-body::-webkit-scrollbar {
-    display: none;
-    /* Chrome, Safari, Edge */
+/* Main nav bar */
+.mainnav {
+  position: sticky;
+  top: 36px; /* sits just below the topbar */
+  z-index: 999;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 10px 16px;
+
+  &__logo img {
+    display: block;
+    height: 40px; /* adjust as needed */
+    width: auto;
+  }
+
+  &__menu {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    > button {
+      font: inherit;
+      color: #111;
+      background: transparent;
+      border: none;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+
+    /* React-Bootstrap dropdown looks like our buttons */
+    .dd-toggle.dropdown-toggle {
+      background: transparent;
+      color: #111;
+      border: none;
+      padding: 8px 12px;
+
+      &:focus, &:active, &:hover {
+        background: transparent !important;
+        color: #111 !important;
+        box-shadow: none !important;
+      }
+    }
+
+    .dd-menu.dropdown-menu {
+      min-width: 180px;
+      border: 1px solid #eee;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+  }
 }
 
-body {
-    -ms-overflow-style: none;
-    /* IE and Edge Legacy */
-    scrollbar-width: none;
-    /* Firefox */
+/* Page sections */
+.page {
+  /* create breathing room so sticky headers don’t overlap first content */
+  .hero {
+    padding: 96px 16px 48px;
+    background: #faf7ff;
+    text-align: center;
+
+    h1 { margin: 0 0 8px 0; }
+    h3 { margin: 0; font-weight: 500; color: #444; }
+  }
+
+  .block {
+    padding: 80px 16px;
+    min-height: 60vh;
+  }
+
+  .aboutus { background: #ffe5e5; }
+  .features { background: #ffe9cc; }
+  .solutions { background: #fff9cc; }
+  .pricing  { background: #e6ffe6; }
+  .resources{ background: #e6f0ff; }
+  .contact  { background: #f0e6ff; }
 }
