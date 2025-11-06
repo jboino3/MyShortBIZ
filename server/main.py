@@ -48,3 +48,5 @@ def delete_business(biz_id: str):
         raise HTTPException(status_code=404, detail="Not found")
     del DB[biz_id]
     return None
+
+
