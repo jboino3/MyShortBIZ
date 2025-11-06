@@ -25,6 +25,10 @@ import Thesis from "./Thesis/Thesis";
 import CV from "./CV/CV";
 import Bio from "./Bio/Bio";
 import Misc from "./Misc/Misc";
+import SignIn from "./SignIn/SignIn";
+import Settings from "./Settings/Settings";
+import Register from "./Register/Register";
+import HelpAndContact from "./HelpAndContact/HelpAndContact";
 
 export default function App() {
   return (
