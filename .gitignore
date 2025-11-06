@@ -10,10 +10,19 @@ __pycache__/
 *.pyc
 
 # Node
-client/node_modules/
-client/dist/
-
+node_modules/
+node_modules/*
+/node_modules
+/node_modules/
+/node_modules/*
+dist/
+**/node_modules
+node_modules/**
 # Env
 **/.env
 
-
+#Misc
+eslint.config.js
+package-lock.json
+package.json
+tsconfig.node.json
