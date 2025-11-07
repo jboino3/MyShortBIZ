@@ -1,0 +1,8 @@
+Here is how to set up the github for WINDOWS:
+Clone the repository locally: git clone https://github.com/jboino3/MyShortBIZ.git
+Go to the "UI fixes and organization" commit (either uisng git branch UI fixes and organization, or github desktop or vscode git). It should automatically change your file structure to have all of the files from that commit.
+Copy all of those files into a new folder
+Change to be on the main branch again
+Move all MISSING folders from the copy (line 5 folder) to the updated github (line 2 folder) (do NOT overwrite any files)
+Your github tracking device (VSCode, GitHub Desktop, etc) should NOT add those files to the repository when you make a change, ESPECIALLY the node_modules folder
+If there is an error, or you are about to push your node modules, 
