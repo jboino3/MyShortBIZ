@@ -1,0 +1,124 @@
+/* ─── Top utility bar ───────────────────────────── */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  height: 36px;
+  background: #ffffff;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+
+  .topbar__left,
+  .topbar__right {
+    display: flex;
+    gap: 12px;
+  }
+
+  .topbar__left {
+    margin-right: auto;
+  }
+  .topbar__right {
+    margin-left: auto;
+  }
+
+  .linklike {
+    font: inherit;
+    font-size: 0.85rem;
+    color: #111;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    text-decoration: none;
+
+    &:hover {
+      color: #7a3cff; /* subtle hover accent */
+    }
+  }
+}
+
+/* ─── Main nav bar ─────────────────────────────── */
+.mainnav {
+  position: sticky;
+  top: 36px;
+  z-index: 999;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 10px 16px;
+
+  &__logo img {
+    display: block;
+    height: 40px;
+    width: auto;
+  }
+
+  &__menu {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    /* Make NavLink anchors look like buttons */
+    > a {
+      font: inherit;
+      color: #111;
+      background: transparent;
+      border: none;
+      padding: 8px 12px;
+      cursor: pointer;
+      text-decoration: none;      /* removes blue underline */
+      transition: color 0.2s;
+
+      &:hover {
+        color: #7a3cff;
+      }
+
+      &.active {
+        border-bottom: 2px solid #7a3cff; /* underline active page */
+      }
+    }
+
+    /* Dropdown button styled like a normal nav button */
+    .dd-toggle.dropdown-toggle {
+      background: transparent;
+      color: #111;
+      border: none;
+      padding: 8px 12px;
+      text-decoration: none;
+
+      &:focus,
+      &:active,
+      &:hover {
+        background: transparent !important;
+        color: #7a3cff !important;
+        box-shadow: none !important;
+      }
+    }
+
+    /* Dropdown menu background & spacing */
+    .dd-menu.dropdown-menu {
+      min-width: 180px;
+      border: 1px solid #eee;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      background: #fff;
+      padding: 0;
+
+      a {
+        color: #111;
+        text-decoration: none;
+        display: block;
+        padding: 8px 12px;
+
+        &:hover {
+          background: #f5f0ff;
+          color: #7a3cff;
+        }
+      }
+    }
+  }
+}
