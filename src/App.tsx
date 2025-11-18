@@ -1,34 +1,34 @@
 import { Routes, Route } from "react-router-dom";
-import Layout from "./components/Layout";
+import Layout from "./Misc/Layout";
 
 // Home 
-import Home from "./Home/Home"; 
+import Home from "./Site Pages/Home"; 
 
 // Primary pages 
-import About from "./pages/About";
-import Features from "./pages/Features";
-import Solutions from "./pages/Solutions";
-import Pricing from "./pages/Pricing";
-import Resources from "./pages/Resources";
-import Contact from "./pages/Contact";
+import About from "./Site Pages/About";
+import Features from "./Site Pages/Features";
+import Solutions from "./Site Pages/Solutions";
+import Pricing from "./Site Pages/Pricing";
+import Resources from "./Site Pages/Resources";
+import Contact from "./Site Pages/Contact";
 
 // Extra sections using existing folder names (each should export a default page component)
 import CreatorHome from "./CreatorHome/CreatorHome";
-import Shop from "./Shop/Shop";
-import Store from "./Store/Store";
-import Studio from "./Studio/Studio";
-import Blog from "./Blog/Blog";
-import Social from "./Social/Social";
-import LinkPage from "./Link/Link";    
-import Video from "./Video/Video";
-import Thesis from "./Thesis/Thesis";
-import CV from "./CV/CV";
-import Bio from "./Bio/Bio";
+import Shop from "./CreatorHome/Shop";
+import Store from "./CreatorHome/Store";
+import Studio from "./CreatorHome/Studio";
+import Blog from "./CreatorHome/Blog";
+import Social from "./CreatorHome/Social";
+import LinkPage from "./CreatorHome/Link";    
+import Video from "./CreatorHome/Video";
+import Thesis from "./CreatorHome/Thesis";
+import CV from "./CreatorHome/CV";
+import Bio from "./CreatorHome/Bio";
 import Misc from "./Misc/Misc";
-import SignIn from "./SignIn/SignIn";
-import Settings from "./Settings/Settings";
-import Register from "./Register/Register";
-import HelpAndContact from "./HelpAndContact/HelpAndContact";
+import SignIn from "./AccountCreationAndPayment/SignIn";
+import Settings from "./CreatorHome/Settings";
+import Register from "./AccountCreationAndPayment/Register";
+import HelpAndContact from "./Misc/HelpAndContact";
 
 export default function App() {
   return (
