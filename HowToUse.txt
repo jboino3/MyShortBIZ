@@ -12,3 +12,11 @@ source .venv/bin/activate      # (Windows → .\.venv\Scripts\activate)
 uvicorn main:app --reload --port 8000
 
 
+http://127.0.0.1:8000/docs
+http://127.0.0.1:8000/api/health
+
+
+{
+  "invoiceId": "92679f18-c98f-4b6a-ab41-a215785fb091",
+  "status": "Settled"
+}

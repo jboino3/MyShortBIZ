@@ -1,12 +1,24 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from typing import Optional, List
-import uuid
 
-app = FastAPI(title="myShortBiz API")
+from routers.auth import router as AuthRouter
+from routers.contact import router as ContactRouter
+from routers.pricing import router as PricingRouter
+from routers.payments import router as PaymentsRouter
+from routers.content import router as ContentRouter
 
-# Allow React dev server
+from db import Base, engine
+import models  # noqa: F401  (make sure models are imported so metadata is populated)
+
+app = FastAPI(
+    title="MyShortBIZ API",
+    swagger_ui_parameters={"persistAuthorization": True},  # keep token across refreshes
+)
+
+# Create all tables
+Base.metadata.create_all(bind=engine)
+
+# CORS for frontend
 origins = ["http://localhost:5173"]
 
 app.add_middleware(
@@ -17,36 +29,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-class BizCreate(BaseModel):
-    name: str
-    description: Optional[str] = None
 
-class Biz(BizCreate):
-    id: str
+@app.get("/")
+def root():
+    return {"message": "MyShortBIZ API is running", "docs": "/docs"}
 
-DB: dict[str, Biz] = {}
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok", "service": "myShortBiz"}
-
-@app.get("/api/business", response_model=List[Biz])
-def list_businesses():
-    return list(DB.values())
-
-@app.post("/api/business", response_model=Biz, status_code=201)
-def create_business(payload: BizCreate):
-    if not payload.name.strip():
-        raise HTTPException(status_code=400, detail="Name is required")
-    biz = Biz(id=str(uuid.uuid4()), **payload.dict())
-    DB[biz.id] = biz
-    return biz
-
-@app.delete("/api/business/{biz_id}", status_code=204)
-def delete_business(biz_id: str):
-    if biz_id not in DB:
-        raise HTTPException(status_code=404, detail="Not found")
-    del DB[biz_id]
-    return None
+    return {"status": "ok", "service": "MyShortBIZ"}
 
 
+# ----- Mount Routers -----
+
+app.include_router(AuthRouter)
+app.include_router(ContactRouter)
+app.include_router(PricingRouter)
+app.include_router(PaymentsRouter)
+app.include_router(ContentRouter)
