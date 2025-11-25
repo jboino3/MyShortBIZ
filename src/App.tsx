@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import Layout from "./Misc/Layout";
 
 // Home 
-import Home from "./Site Pages/Home"; 
+import Home from "./Home/Home"; 
 
 
 // Primary pages 
