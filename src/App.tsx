@@ -4,13 +4,15 @@ import Layout from "./Misc/Layout";
 // Home 
 import Home from "./Site Pages/Home"; 
 
+
 // Primary pages 
-import About from "./Site Pages/About";
-import Features from "./Site Pages/Features";
-import Solutions from "./Site Pages/Solutions";
-import Pricing from "./Site Pages/Pricing";
-import Resources from "./Site Pages/Resources";
-import Contact from "./Site Pages/Contact";
+import About from "./pages/About";
+import Features from "./pages/Features";
+import Solutions from "./pages/Solutions";
+import Pricing from "./pages/Pricing";
+import Resources from "./pages/Resources";
+import Contact from "./pages/Contact";
+
 
 // Extra sections using existing folder names (each should export a default page component)
 import CreatorHome from "./CreatorHome/CreatorHome";
