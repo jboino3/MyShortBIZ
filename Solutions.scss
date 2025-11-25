@@ -1,0 +1,127 @@
+.solutions-page {
+  padding: 40px 16px;
+  font-family: system-ui, sans-serif;
+  background-color: #ffffff;
+  color: #333;
+
+  /* Hero Section */
+  .solutions-hero {
+    text-align: center;
+    margin-bottom: 48px;
+
+    h1 {
+      font-size: clamp(28px, 4vw, 48px);
+      margin-bottom: 12px;
+    }
+
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 24px;
+      max-width: 720px;
+      margin-left: auto;
+      margin-right: auto;
+      color: #555;
+    }
+
+    .solutions-nav ul {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li a {
+        color: #6B5DD3; // lavender links
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s;
+      }
+
+      li a:hover {
+        color: #AFCBFF; // skyblue on hover
+      }
+    }
+  }
+
+  /* Section Cards */
+  .solution-section {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 40px;
+
+    .solution-card {
+      background: #ffffff;
+      border: 2px solid #E6E0FF; // lavender border
+      border-radius: 16px;
+      max-width: 600px;
+      width: 100%;
+      padding: 24px 32px;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(178, 168, 255, 0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 28px rgba(178, 168, 255, 0.2);
+      }
+
+      .icon-wrapper {
+        font-size: 2.5rem;
+        margin-bottom: 16px;
+        display: inline-flex;
+        padding: 16px;
+        border-radius: 50%;
+        color: #fff;
+
+        &.lavender {
+          background-color: #E6E0FF;
+          color: #6B5DD3;
+        }
+        &.skyblue {
+          background-color: #AFCBFF;
+          color: #1C4E8B;
+        }
+      }
+
+      h2 {
+        margin-bottom: 12px;
+        font-size: 1.8rem;
+      }
+
+      p {
+        margin-bottom: 16px;
+        color: #555;
+      }
+
+      ul {
+        list-style: disc;
+        padding-left: 20px;
+        text-align: left;
+        margin-bottom: 20px;
+
+        li {
+          margin-bottom: 8px;
+        }
+      }
+
+      .cta-btn {
+        display: inline-block;
+        padding: 10px 24px;
+        background-color: #6B5DD3; // lavender
+        color: #fff;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: background 0.2s, transform 0.2s;
+
+        &:hover {
+          background-color: #AFCBFF; // skyblue
+          color: #fff;
+          transform: translateY(-2px);
+        }
+      }
+    }
+  }
+}
