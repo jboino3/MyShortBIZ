@@ -23,7 +23,7 @@ class BtcPayService:
 
     def __init__(
         self,
-        base_url: str = "https://btcpay.example.com",  # TODO: replace
+        base_url: str = "https://btcpay.example.com",  #replace
         store_id: Optional[str] = None,
         api_key: Optional[str] = None,
     ):
