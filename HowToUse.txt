@@ -20,3 +20,33 @@ http://127.0.0.1:8000/api/health
   "invoiceId": "92679f18-c98f-4b6a-ab41-a215785fb091",
   "status": "Settled"
 }
+
+
+j 
+
+tokens per pricing
+
+sora veo pricing plan dif
+
+track analytics find best price point per tokens (excel)
+
+free / 10$ (token) / 30$ (token) / 70$ (token) / all purpose business plan (custom token) 
+
+
+
+CV loss leader (free)
+
+Bio (free version) / trackable links per pay
+
+curated blog (fluff) - questions ( topic , link , word count [small, med, large, {word count}] , chart , bullets , numbered , q&a , images [ generate, attach ] )
+posting
+**** https://quillbot.com/grammar-check?referrer=ai-blog-post-generator ****
+**** https://later.com/try/trial/get-started/?utm_source=google&utm_medium=cpc&utm_campaign=pMax%20-%20All%20Channels%20-%20Remarketing&utm_content=&utm_term=&gad_source=1&gad_campaignid=21870031191&gbraid=0AAAAADgTQ6OqTbNxNQHDNtyhD7N821VS6&gclid=EAIaIQobChMIkPDksIulkgMVhjhECB0dGBLTEAAYAiAAEgKSv_D_BwE ****
+
+
+
+SEO ai vs human written ranking (check later)
+
+
+loss per person tracking
+
