@@ -46,6 +46,12 @@ export default function App() {
         <Route path="/resources" element={<Resources />} />
         <Route path="/contact" element={<Contact />} />
 
+        {/* Sign In and Account Management */}
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/help" element={<HelpAndContact />} />
+
         {/* More */}
         <Route path="/creator" element={<CreatorHome />} />
         <Route path="/shop" element={<Shop />} />

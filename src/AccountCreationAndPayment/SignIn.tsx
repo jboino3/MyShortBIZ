@@ -1,11 +1,12 @@
 import './style.scss'
 
-function App() {
+function SignIn() {
 
   return (
     <>
+    <h1>SignIn</h1>
     </>
   )
 }
 
-export default App
+export default SignIn
