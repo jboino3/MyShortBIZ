@@ -6,6 +6,7 @@ from routers.contact import router as ContactRouter
 from routers.pricing import router as PricingRouter
 from routers.payments import router as PaymentsRouter
 from routers.content import router as ContentRouter
+from routers.blog import router as BlogRouter
 
 from db import Base, engine
 import models  # noqa: F401  (make sure models are imported so metadata is populated)
@@ -47,3 +48,4 @@ app.include_router(ContactRouter)
 app.include_router(PricingRouter)
 app.include_router(PaymentsRouter)
 app.include_router(ContentRouter)
+app.include_router(BlogRouter)

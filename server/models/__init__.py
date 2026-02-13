@@ -13,8 +13,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship
 
 from db import Base
-
-
+from .blog import Blog
 # ------------------------
 # Users / Auth
 # ------------------------
