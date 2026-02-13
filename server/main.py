@@ -9,19 +9,16 @@ from routers.content import router as ContentRouter
 from routers.blog import router as BlogRouter
 
 from db import Base, engine
-import models  # noqa: F401  (make sure models are imported so metadata is populated)
+import models  # noqa: F401  <-- must happen BEFORE create_all
 
 app = FastAPI(
     title="MyShortBIZ API",
-    swagger_ui_parameters={"persistAuthorization": True},  # keep token across refreshes
+    swagger_ui_parameters={"persistAuthorization": True},
 )
 
-# Create all tables
 Base.metadata.create_all(bind=engine)
 
-# CORS for frontend
 origins = ["http://localhost:5173"]
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -30,18 +27,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 @app.get("/")
 def root():
     return {"message": "MyShortBIZ API is running", "docs": "/docs"}
 
-
 @app.get("/api/health")
 def health():
     return {"status": "ok", "service": "MyShortBIZ"}
-
-
-# ----- Mount Routers -----
 
 app.include_router(AuthRouter)
 app.include_router(ContactRouter)
