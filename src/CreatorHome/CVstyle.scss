@@ -1,0 +1,77 @@
+.page {
+  position: relative;
+  min-height: 100vh;
+  padding: 6rem 1.75rem 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 0;
+}
+
+.page p{
+  max-width: 800px;
+  font-size: 1.25rem;
+  color: #555;
+}
+
+.intro-block{
+  display:flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.5rem;
+}
+
+button{
+  padding: 0.75rem 1.4rem;
+  font-size: 1rem;
+  border-radius: 36px;
+
+  border: none;
+  cursor: pointer;
+
+  background: #a741cf;
+  color: white;
+
+  transition: all 0.2s ease;
+}
+
+button:hover{
+  background: #1d4ed8;
+  transform: translateY(-2px);
+}
+// .primary-btn {
+//   background: #a741cf;
+//   color: white;
+// }
+// .primary-btn:hover {
+//   background: #1d4ed8;
+//   transform: translateY(-2px);
+// }
+// .secondary-btn {
+//   background: #a741cf;
+//   color: white;
+// }
+// .secondary-btn:hover {
+//   background: #1d4ed8;
+//   transform: translateY(-2px);
+// }
+.btn-group {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+ul{
+  list-style: none;
+  
+}
+
+.resume-layout, .portfolio-layout{
+  margin-top: 2rem;  
+  margin-bottom: 2rem;  
+  display:flex;
+  flex-direction: column;
+  align-items: left;
+  text-align: left;
+}
