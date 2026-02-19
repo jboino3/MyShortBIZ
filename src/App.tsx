@@ -21,16 +21,31 @@ import Store from "./CreatorHome/Store";
 import Studio from "./CreatorHome/Studio";
 import Blog from "./CreatorHome/Blog";
 import Social from "./CreatorHome/Social";
-import LinkPage from "./CreatorHome/Link";    
+// import LinkPage from "./CreatorHome/Link";    
 import Video from "./CreatorHome/Video";
 import Thesis from "./CreatorHome/Thesis";
 import CV from "./CreatorHome/CV";
 import Bio from "./CreatorHome/Bio";
 import Misc from "./Misc/Misc";
 import SignIn from "./AccountCreationAndPayment/SignIn";
-import Settings from "./CreatorHome/Settings";
 import Register from "./AccountCreationAndPayment/Register";
 import HelpAndContact from "./Misc/HelpAndContact";
+import Settings from "./CreatorHome/Settings";
+
+
+// Links Pages
+import LinkLayout from "./Link/Layout";
+import Dashboard from "./Link/Dashboard";
+import LinkNotes from "./Link/Notes";
+import LinkAnalytics from "./Link/Analytics";
+import LinkVerification from "./Link/Verification";
+import LinkSettings from "./Link/Settings";
+// import LinksLayout from "./Link/Layout";
+// import Link from "./Link/Link";
+// import LinkNotes from "./Link/Notes";
+// import LinkAnalytics from "./Link/Analytics";
+// import LinkVerification from "./Link/Verification";
+// import LinkSettings from "./Link/Settings";
 
 export default function App() {
   return (
@@ -59,12 +74,22 @@ export default function App() {
         <Route path="/studio" element={<Studio />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/social" element={<Social />} />
-        <Route path="/link" element={<LinkPage />} />
+        {/* <Route path="/link" element={<LinkPage />} /> */}
         <Route path="/video" element={<Video />} />
         <Route path="/thesis" element={<Thesis />} />
         <Route path="/cv" element={<CV />} />
+
         <Route path="/bio" element={<Bio />} />
         <Route path="/misc" element={<Misc />} />
+
+        {/* Links */}
+        <Route path="/link" element={<LinkLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="notes" element={<LinkNotes />} />
+          <Route path="analytics" element={<LinkAnalytics />} />
+          <Route path="verification" element={<LinkVerification />} />
+          <Route path="settings" element={<LinkSettings />} />
+        </Route>
 
         {/* Catch-all */}
         <Route path="*" element={<Home />} />
