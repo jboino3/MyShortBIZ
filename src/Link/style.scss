@@ -1,0 +1,40 @@
+/* Layout.scss */
+.link-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.link-main {
+  flex: 1;
+  padding: 2rem;
+}
+
+/* Sidebar Style */
+.link-sidebar {
+  width: 220px;
+  background-color: #f3f4f6; 
+  padding: 1rem;
+}
+
+.link-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.link-nav a {
+  text-decoration: none;
+  color: #111827;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.25rem;
+}
+
+.link-nav a.active {
+  font-weight: bold;
+  color: #1d4ed8; 
+  background-color: #e0e7ff; /* light highlight for active */
+}
+
+.link-nav a:hover {
+  background-color: #dbeafe; /* light hover effect */
+}
