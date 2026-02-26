@@ -1,0 +1,710 @@
+/* ========== GLOBAL APP CANVAS ========== */
+
+/* =========================
+   THEME TOKENS (light/dark)
+   Apply by setting: <html data-theme="dark"> OR "light"
+   If no data-theme, system preference will apply.
+   ========================= */
+
+:root {
+    /* surfaces */
+    --bg: #ffffff;
+    --panel: rgba(255, 255, 255, 0.02);
+    /* text */
+    --text: #0f172a;
+    /* borders + subtle fills */
+    --border: rgba(0, 0, 0, 0.12);
+    --border-strong: rgba(0, 0, 0, 0.45);
+    --line-soft: rgba(0, 0, 0, 0.06);
+    --fill-soft: rgba(0, 0, 0, 0.03);
+    --fill-danger: rgba(255, 0, 0, 0.06);
+    --fill-published: rgba(0, 160, 0, 0.08);
+    --fill-draft: rgba(255, 170, 0, 0.1);
+    --placeholder: rgba(15, 23, 42, 0.55);
+}
+
+/* Explicit dark mode */
+:root[data-theme="dark"] {
+    --bg: #0b1220;
+    --panel: rgba(255, 255, 255, 0.04);
+    --text: #e5e7eb;
+    --border: rgba(229, 231, 235, 0.14);
+    --border-strong: rgba(229, 231, 235, 0.35);
+    --line-soft: rgba(229, 231, 235, 0.1);
+    --fill-soft: rgba(255, 255, 255, 0.06);
+    --fill-danger: rgba(239, 68, 68, 0.14);
+    --fill-published: rgba(34, 197, 94, 0.14);
+    --fill-draft: rgba(245, 158, 11, 0.16);
+    --placeholder: rgba(229, 231, 235, 0.55);
+}
+
+/* System dark (only when user chooses "system" and you do NOT set data-theme) */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+        --bg: #0b1220;
+        --panel: rgba(255, 255, 255, 0.04);
+        --text: #e5e7eb;
+        --border: rgba(229, 231, 235, 0.14);
+        --border-strong: rgba(229, 231, 235, 0.35);
+        --line-soft: rgba(229, 231, 235, 0.1);
+        --fill-soft: rgba(255, 255, 255, 0.06);
+        --fill-danger: rgba(239, 68, 68, 0.14);
+        --fill-published: rgba(34, 197, 94, 0.14);
+        --fill-draft: rgba(245, 158, 11, 0.16);
+        --placeholder: rgba(229, 231, 235, 0.55);
+    }
+}
+
+/* Make defaults apply globally */
+html,
+body {
+    background: var(--bg);
+    color: var(--text);
+}
+
+
+.appShell {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    background: var(--bg);
+    color: var(--text);
+}
+
+/* This is the actual UI frame */
+.appContainer {
+    width: 100%;
+    max-width: 1100px; /* controls how wide the site can be */
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+
+/* =========================
+   BLOG PAGE
+   ========================= */
+
+.blogPage {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.blogPage__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.blogPage__title {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.blogPage__subtitle {
+    margin: 8px 0 0;
+    opacity: 0.8;
+}
+
+.blogPage__headerActions {
+    display: flex;
+    gap: 10px;
+}
+
+.blogPage__toolbar {
+    display: grid;
+    grid-template-columns: 1fr 170px 170px;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.blogPage__grid {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 16px;
+}
+
+.blogPage__panel,
+.blogPage__card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    background: var(--panel);
+}
+
+.blogPage__panelHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.blogPage__panelTitle {
+    font-weight: 900;
+}
+
+.blogPage__panelMeta {
+    opacity: 0.7;
+    font-size: 12px;
+}
+
+.blogPage__list {
+    display: grid;
+    gap: 10px;
+}
+
+.blogPage__item {
+    text-align: left;
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    color: inherit;
+}
+
+.blogPage__item.isActive {
+    border: 2px solid var(--border-strong);
+    background: var(--fill-soft);
+}
+
+.blogPage__itemTop {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+}
+
+.blogPage__itemTitle {
+    font-weight: 900;
+}
+
+.blogPage__itemSub {
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+}
+
+.blogPage__itemExcerpt {
+    margin-top: 8px;
+    opacity: 0.85;
+    font-size: 13px;
+}
+
+.blogPage__tagRow {
+    margin-top: 10px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.blogPage__tag {
+    font-size: 12px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    opacity: 0.9;
+}
+
+.blogPage__stack {
+    display: grid;
+    gap: 16px;
+}
+
+.blogPage__cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.blogPage__cardTitle {
+    font-weight: 900;
+}
+
+.blogPage__cardActions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.blogPage__btn,
+.blogPage__btnSecondary,
+.blogPage__btnDanger {
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--fill-soft);
+    cursor: pointer;
+    color: inherit;
+}
+
+.blogPage__btnSecondary {
+    background: transparent;
+}
+
+.blogPage__btnDanger {
+    background: var(--fill-danger);
+}
+
+.blogPage__btn:disabled,
+.blogPage__btnSecondary:disabled,
+.blogPage__btnDanger:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.blogPage__input,
+.blogPage__textarea,
+.blogPage__select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: inherit;
+}
+
+.blogPage__input::placeholder,
+.blogPage__textarea::placeholder {
+    color: var(--placeholder);
+}
+
+.blogPage__textarea {
+    resize: vertical;
+    font-family: inherit;
+}
+
+.blogPage__label {
+    display: grid;
+    gap: 6px;
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+.blogPage__form {
+    display: grid;
+    gap: 12px;
+}
+
+.blogPage__row2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.blogPage__metaBar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 12px;
+    opacity: 0.75;
+}
+
+.blogPage__previewTitle {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 900;
+}
+
+.blogPage__previewMeta {
+    margin-top: 8px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.blogPage__previewExcerpt {
+    margin: 12px 0 0;
+    opacity: 0.85;
+}
+
+.blogPage__previewBody {
+    margin-top: 12px;
+}
+
+.blogPage__pre {
+    margin: 0;
+    white-space: pre-wrap;
+    line-height: 1.5;
+    font-family: inherit;
+    opacity: 0.95;
+}
+
+.blogPage__pill {
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    opacity: 0.9;
+}
+
+.blogPage__pill.isPublished {
+    background: var(--fill-published);
+}
+
+.blogPage__pill.isDraft {
+    background: var(--fill-draft);
+}
+
+.blogPage__mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 12px;
+    opacity: 0.75;
+}
+
+.blogPage__muted {
+    opacity: 0.7;
+}
+
+.blogPage__dot {
+    opacity: 0.5;
+}
+
+.blogPage__empty,
+.blogPage__hint {
+    opacity: 0.75;
+}
+
+.blogPage__ai {
+    display: grid;
+    gap: 12px;
+}
+
+.blogPage__aiRow {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 10px;
+}
+
+/* =========================
+   SHOP PAGE
+   ========================= */
+
+/* Scrollable container per sprint notes */
+.shopPage {
+    width: 100%;
+}
+
+.shopPage__scroll {
+    height: calc(100vh - 80px);
+    overflow-y: auto;
+    padding: 2.5vh 4%;
+}
+
+/* Reusable atoms (repeatable spacing + mobile-friendly) */
+.card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    background: var(--panel);
+}
+
+.input,
+.select,
+.textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+}
+
+.input::placeholder,
+.textarea::placeholder {
+    color: var(--placeholder);
+}
+
+.textarea {
+    resize: vertical;
+    font-family: inherit;
+}
+
+.btn {
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--fill-soft);
+    cursor: pointer;
+    color: var(--text);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn--secondary {
+    background: transparent;
+}
+
+.btn--danger {
+    background: var(--fill-danger);
+}
+
+.muted {
+    opacity: 0.75;
+    font-size: 12px;
+}
+
+.emptyState {
+    opacity: 0.75;
+    padding: 10px;
+}
+
+/* Header */
+.shopHeader {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: flex-start;
+    margin-bottom: 14px;
+}
+
+.shopHeader__title {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.shopHeader__subtitle {
+    margin: 8px 0 0;
+    opacity: 0.8;
+}
+
+.shopHeader__right {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.shopHeader__cartChip {
+    padding: 10px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--fill-soft);
+}
+
+/* Filters */
+.shopFilters {
+    display: grid;
+    grid-template-columns: 1fr 200px 180px 160px;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+/* Main grid */
+.shopGrid {
+    display: grid;
+    grid-template-columns: 1fr 34%;
+    gap: 16px;
+}
+
+.shopCards {
+    display: grid;
+    gap: 12px;
+}
+
+/* Product card */
+.productCard__top {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.productCard__name {
+    font-weight: 900;
+}
+
+.productCard__meta {
+    margin-top: 6px;
+    font-size: 12px;
+    opacity: 0.75;
+}
+
+.productCard__price {
+    font-weight: 900;
+}
+
+.productCard__desc {
+    margin-top: 10px;
+    opacity: 0.85;
+}
+
+.productCard__actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+
+/* Pills */
+.pill {
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+}
+
+.pill--active {
+    background: var(--fill-published);
+}
+
+.pill--draft {
+    background: var(--fill-draft);
+}
+
+/* Sidebar */
+.sideCard__title {
+    font-weight: 900;
+    margin-bottom: 10px;
+}
+
+.sideCard__footer {
+    margin-top: 12px;
+    display: grid;
+    gap: 10px;
+}
+
+.totalRow {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.cartList {
+    display: grid;
+    gap: 10px;
+}
+
+.cartRow {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 0;
+    border-top: 1px solid var(--line-soft);
+}
+
+.cartRow:first-child {
+    border-top: none;
+    padding-top: 0;
+}
+
+.cartRow__name {
+    font-weight: 800;
+}
+
+.cartRow__qty {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.qtyBtn {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    color: var(--text);
+}
+
+.qtyNum {
+    min-width: 20px;
+    text-align: center;
+    font-weight: 800;
+}
+
+/* Admin form helpers */
+.field {
+    display: grid;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.field__label {
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+.row2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.aiPlaceholder {
+    margin-top: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px dashed var(--border);
+    opacity: 0.75;
+    font-size: 12px;
+}
+
+/* Mobile */
+@media (max-width: 900px) {
+    .shopFilters {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .shopGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .shopPage__scroll {
+        padding: 2vh 4%;
+    }
+}
+
+/* =========================
+   SETTINGS PAGE: nicer hover spacing
+   ========================= */
+
+.settingsGrid {
+    /* increase space between cards */
+    gap: 18px;
+}
+
+/* Make each card slightly inset so hover highlight has room */
+.settingsGrid > .card {
+    width: calc(100% - 10px);
+    justify-self: center; /* center it inside the grid cell */
+    transition: transform 140ms ease, box-shadow 140ms ease, outline-color 140ms ease;
+}
+
+/* Hover/Focus: no layout shift, just a clean pop */
+.settingsGrid > .card:hover,
+.settingsGrid > .card:focus-within {
+    transform: translateY(-2px);
+    outline: 2px solid var(--border-strong);
+    outline-offset: 2px;
+    box-shadow: 0 10px 24px rgba(0,0,0,.10);
+}
+
+/* If you have a span2 card, keep it aligned too */
+.settingsGrid__span2 {
+    justify-self: stretch;
+    width: calc(100% - 10px);
+}
+
+.settingsHeader__actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
