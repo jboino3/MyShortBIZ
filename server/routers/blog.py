@@ -1,11 +1,10 @@
 # server/routers/blog.py
 
-from fastapi import APIRouter, Depends, HTTPException, Header
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-import json
 
 from db import get_db
-from models.blog import Blog
+from models import Blog, User
 from schemas.blog import BlogGenerateRequest, BlogGenerateResponse
 from services.blog_service import (
     estimate_token_cost,
@@ -14,56 +13,41 @@ from services.blog_service import (
     extract_title,
 )
 
-# NOTE: Replace with your real SQLAlchemy User model import
-# Example:
-# from models.user import User
-# For now, we’ll query "users" table via raw SQL if needed.
-
-from sqlalchemy import text
+from routers.auth import get_current_user, UserOut
 
 router = APIRouter(prefix="/api/blog", tags=["Blog"])
 
 
+# ------------------------
+# Generate Blog
+# ------------------------
 @router.post("/generate", response_model=BlogGenerateResponse)
 def generate_blog(
     req: BlogGenerateRequest,
+    current_user: UserOut = Depends(get_current_user),
     db: Session = Depends(get_db),
-    x_user_id: str | None = Header(default=None, alias="X-User-Id"),
 ):
-    if not x_user_id:
-        raise HTTPException(
-            status_code=401,
-            detail="Missing X-User-Id header (temporary dev auth).",
-        )
-
-    # Fetch tokens for the user (assumes users table has tokens_remaining)
-    row = db.execute(
-        text("SELECT id, tokens_remaining FROM users WHERE id = :id"),
-        {"id": x_user_id},
-    ).mappings().first()
-
-    if not row:
-        raise HTTPException(404, "User not found for X-User-Id")
+    user = db.query(User).filter(User.id == current_user.id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
 
     token_cost = estimate_token_cost(req.word_count, req.features)
-    if row["tokens_remaining"] < token_cost:
-        raise HTTPException(status_code=402, detail="Not enough tokens.")
 
-    markdown_text = generate_blog_markdown(req)
+    if user.tokens_remaining < token_cost:
+        raise HTTPException(
+            status_code=status.HTTP_402_PAYMENT_REQUIRED,
+            detail="Not enough tokens.",
+        )
+
+    markdown_text = generate_blog_markdown(req, db, user)
     if not markdown_text:
-        raise HTTPException(500, "Model returned empty output.")
+        raise HTTPException(status_code=500, detail="Model returned empty output.")
 
     html = markdown_to_html(markdown_text)
     title = extract_title(markdown_text)
 
-    # Deduct tokens
-    db.execute(
-        text("UPDATE users SET tokens_remaining = tokens_remaining - :cost WHERE id = :id"),
-        {"cost": token_cost, "id": x_user_id},
-    )
-
     blog = Blog(
-        user_id=x_user_id,
+        user_id=user.id,
         title=title,
         topic=req.topic,
         audience=req.audience,
@@ -79,25 +63,48 @@ def generate_blog(
     db.commit()
     db.refresh(blog)
 
-    # Fetch new balance
-    new_row = db.execute(
-        text("SELECT tokens_remaining FROM users WHERE id = :id"),
-        {"id": x_user_id},
-    ).mappings().first()
-
     return BlogGenerateResponse(
         blog_id=blog.id,
         title=blog.title,
         token_cost=blog.token_cost,
-        tokens_remaining=new_row["tokens_remaining"],
+        tokens_remaining=user.tokens_remaining,
         content_markdown=blog.content_markdown,
         content_html=blog.content_html,
     )
 
 
+# ------------------------
+# Get Single Blog
+# ------------------------
 @router.get("/{blog_id}")
-def get_blog(blog_id: int, db: Session = Depends(get_db)):
-    blog = db.query(Blog).filter(Blog.id == blog_id).first()
+def get_blog(
+    blog_id: int,
+    current_user: UserOut = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    blog = (
+        db.query(Blog)
+        .filter(Blog.id == blog_id, Blog.user_id == current_user.id)
+        .first()
+    )
     if not blog:
-        raise HTTPException(404, "Blog not found")
+        raise HTTPException(status_code=404, detail="Blog not found")
     return blog
+
+
+# ------------------------
+# Get My Blogs
+# ------------------------
+@router.get("/my")
+def get_my_blogs(
+    current_user: UserOut = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    blogs = (
+        db.query(Blog)
+        .filter(Blog.user_id == current_user.id)
+        .order_by(Blog.created_at.desc())
+        .all()
+    )
+
+    return blogs

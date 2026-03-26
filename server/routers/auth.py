@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from uuid import uuid4
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm, APIKeyHeader
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
@@ -18,15 +18,12 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 # Config
 # ------------------------
 
-# In real prod, load from env
 SECRET_KEY = "CHANGE_ME_SUPER_SECRET_KEY"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
 
-# Use PBKDF2-SHA256 to avoid bcrypt issues
 pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
 
-# Simple Bearer token header for protected routes
 api_key_header = APIKeyHeader(name="Authorization", auto_error=False)
 
 
@@ -42,11 +39,16 @@ class UserBase(BaseModel):
 class UserCreate(BaseModel):
     email: EmailStr
     password: str
-    role: str = "user"  # later we can restrict admin creation
+    full_name: Optional[str] = None
+    role: str = "user"
 
 
-class UserOut(UserBase):
+class UserOut(BaseModel):
     id: str
+    email: EmailStr
+    full_name: Optional[str] = None
+    role: str
+    tokens_remaining: int
 
 
 class Token(BaseModel):
@@ -72,7 +74,9 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     to_encode = data.copy()
-    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    expire = datetime.utcnow() + (
+        expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
@@ -99,7 +103,9 @@ def _user_to_schema(user: User) -> UserOut:
     return UserOut(
         id=user.id,
         email=user.email,
+        full_name=user.full_name,
         role=user.role,
+        tokens_remaining=user.tokens_remaining,
     )
 
 
@@ -111,9 +117,6 @@ async def get_current_user(
     authorization: str = Depends(api_key_header),
     db: Session = Depends(get_db),
 ) -> UserOut:
-    """
-    Read JWT from Authorization: Bearer <token> header.
-    """
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -150,9 +153,6 @@ async def get_current_user(
 
 @router.post("/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
 def register_user(payload: UserCreate, db: Session = Depends(get_db)):
-    """
-    Register a new user.
-    """
     existing = get_user_by_email(db, payload.email)
     if existing:
         raise HTTPException(
@@ -165,10 +165,14 @@ def register_user(payload: UserCreate, db: Session = Depends(get_db)):
         email=payload.email,
         hashed_password=get_password_hash(payload.password),
         role=payload.role or "user",
+        full_name=payload.full_name,
+        tokens_remaining=0,
     )
+
     db.add(user)
     db.commit()
     db.refresh(user)
+
     return _user_to_schema(user)
 
 
@@ -177,10 +181,6 @@ def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
 ):
-    """
-    Log in with email + password.
-    OAuth2PasswordRequestForm uses "username" field for email.
-    """
     user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
@@ -194,8 +194,5 @@ def login(
 
 
 @router.get("/me", response_model=UserOut)
-def read_me(current_user: UserOut = Depends(get_current_user)):
-    """
-    Get current logged-in user's profile.
-    """
+def get_me(current_user: UserOut = Depends(get_current_user)):
     return current_user

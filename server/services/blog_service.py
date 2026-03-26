@@ -1,9 +1,14 @@
 # server/services/blog_service.py
 
+
 import os
 import markdown as md
 from dotenv import load_dotenv
 from openai import OpenAI
+from services.ai_usage_service import log_ai_usage
+from services.ai_billing_service import calculate_platform_tokens
+from sqlalchemy.orm import Session
+from models import User
 
 from schemas.blog import BlogGenerateRequest, BlogFeatures
 
@@ -85,13 +90,43 @@ def _extract_text(resp) -> str:
     return text
 
 
-def generate_blog_markdown(req: BlogGenerateRequest) -> str:
+def generate_blog_markdown(req: BlogGenerateRequest, db: Session, user: User) -> str:
     prompt = build_prompt(req)
+
     resp = client.responses.create(
         model=OPENAI_MODEL,
         input=prompt,
     )
-    return _extract_text(resp)
+
+    markdown_text = _extract_text(resp)
+
+    # AI USAGE TRACKING
+
+    usage = resp.usage
+    prompt_tokens = usage.input_tokens
+    completion_tokens = usage.output_tokens
+    total_tokens = usage.total_tokens
+
+    # Rough cost estimate (adjust later based on model pricing)
+    cost_usd = total_tokens * 0.000002
+
+    log_ai_usage(
+        db=db,
+        user_id=user.id,
+        feature="blog",
+        model=OPENAI_MODEL,
+        prompt_tokens=prompt_tokens,
+        completion_tokens=completion_tokens,
+        total_tokens=total_tokens,
+        cost_usd=cost_usd,
+    )
+
+    # Deduct platform tokens
+    platform_tokens = calculate_platform_tokens(total_tokens)
+    user.tokens_remaining -= platform_tokens
+    db.commit()
+
+    return markdown_text
 
 
 def markdown_to_html(markdown_text: str) -> str:
