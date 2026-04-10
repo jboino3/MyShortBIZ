@@ -1,6 +1,15 @@
+git clone -c core.protectNTFS=false https://github.com/jboino3/MyShortBIZ
+py -3.12 --version
+cd C:\Users\ewdux\Desktop\MyShortBIZ
+
 FRONT END
 -------------
 cd client
+npm install
+npm run dev 	// must run on GitBash
+
+GITBASH
+cd /c/Users/ewdux/Desktop/MyShortBIZ
 npm run dev
 
 
@@ -10,6 +19,24 @@ BACK END
 cd server
 source .venv/bin/activate      # (Windows → .\.venv\Scripts\activate)
 uvicorn main:app --reload --port 8000
+
+
+GITBASH
+cd /c/Users/ewdux/Desktop/MyShortBIZ/server
+cd server
+py -3.12 -m venv .venv
+pip install uvicorn
+pip install -r requirements.txt #Remove uv-loop from requirements.txt
+pip install -r requirements.txt --ignore-requires-python
+pip install fastapi uvicorn SQLAlchemy "python-jose[cryptography]" "passlib[bcrypt]" pydantic[email] python-multipart
+source .venv/Scripts/activate
+uvicorn main:app --reload --port 8000
+
+
+cd /c/Users/ewdux/Desktop/MyShortBIZ/server
+source .venv/Scripts/activate
+uvicorn main:app --reload --port 8000
+
 
 
 http://127.0.0.1:8000/docs
