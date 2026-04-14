@@ -1,0 +1,12 @@
+.link-sidebar{
+  width: 240px;
+  height: 100vh;
+  border-right: 1px solid #eee;
+  padding: 1rem;
+}
+
+.link-nav{
+  display: flex;
+  flex-direction: column; // 🔥 THIS makes it vertical
+  gap: 0.5rem;
+}

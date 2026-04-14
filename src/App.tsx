@@ -21,16 +21,35 @@ import Store from "./CreatorHome/Store";
 import Studio from "./CreatorHome/Studio";
 import Blog from "./CreatorHome/Blog";
 import Social from "./CreatorHome/Social";
-import LinkPage from "./CreatorHome/Link";    
+// import LinkPage from "./CreatorHome/Link";    
 import Video from "./CreatorHome/Video";
 import Thesis from "./CreatorHome/Thesis";
-import CV from "./CreatorHome/CV";
+// import CV from "./CreatorHome/CV";
 import Bio from "./CreatorHome/Bio";
 import Misc from "./Misc/Misc";
 import SignIn from "./AccountCreationAndPayment/SignIn";
-import Settings from "./CreatorHome/Settings";
 import Register from "./AccountCreationAndPayment/Register";
 import HelpAndContact from "./Misc/HelpAndContact";
+import Settings from "./CreatorHome/Settings";
+
+
+// Links Pages
+import LinkLayout from "./Link/Layout";
+import LinkHome from "./Link/Home";
+import Links from "./Link/Links";
+import LinkCreate from "./Link/LinkCreate";
+import LinkDisappearingNotes from "./Link/DisappearingNotes";
+import LinkViewNote from "./Link/ViewNote";
+import LinkAnalytics from "./Link/Analytics";
+import LinkBlockchainVerification from "./Link/BlockchainVerification";
+// import LinkSettings from "./Link/Settings";  
+
+// CV Pages
+// import CV from "./CV/CV";
+import CVLayout from "./CV/CVLayout";
+import CVPage from "./CV/CVPage";
+import CVBuilder from "./CV/CVBuilder";
+import CVPortfolio from "./CV/CVPortfolio";
 
 export default function App() {
   return (
@@ -59,13 +78,36 @@ export default function App() {
         <Route path="/studio" element={<Studio />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/social" element={<Social />} />
-        <Route path="/link" element={<LinkPage />} />
+        {/* <Route path="/link" element={<LinkPage />} /> */}
         <Route path="/video" element={<Video />} />
         <Route path="/thesis" element={<Thesis />} />
-        <Route path="/cv" element={<CV />} />
+        {/* <Route path="/cv" element={<CV />} /> */}
+
         <Route path="/bio" element={<Bio />} />
         <Route path="/misc" element={<Misc />} />
 
+        {/* Links */}
+        <Route path="/link" element={<LinkLayout />}>
+          <Route index element={<LinkHome />} />
+          <Route path="links" element={<Links />} />
+          <Route path="create" element={<LinkCreate />} />
+          <Route path="notes" element={<LinkDisappearingNotes />} />
+          <Route path="viewnote/:id" element={<LinkViewNote />} />
+          <Route path="analytics" element={<LinkAnalytics />} />
+          <Route path="verification" element={<LinkBlockchainVerification />} />
+          {/* <Route path="settings" element={<LinkSettings />} /> */}
+        </Route>
+
+        {/* CV Pages */}
+        <Route path="/cv" element={<CVLayout />}>
+            {/* Index route: shown when user visits /cv */}
+            <Route index element={<CVPage />} />
+
+            {/* Other child routes */}
+            <Route path="builder" element={<CVBuilder />} />
+            <Route path="portfolio" element={<CVPortfolio />} />
+        </Route>
+      
         {/* Catch-all */}
         <Route path="*" element={<Home />} />
       </Route>
