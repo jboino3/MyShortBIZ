@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from db import get_db
-from models import Plan, Subscription, PaymentEvent
+from models import Plan, Subscription, PaymentEvent, User
 from .auth import get_current_user, UserOut
 
 router = APIRouter(prefix="/payments", tags=["payments"])
@@ -155,22 +155,26 @@ def webhook_stub(
     payload: WebhookStubPayload,
     db: Session = Depends(get_db),
 ):
-    """
-    Stub webhook: flip subscription status based on event_type.
-    In real BTCPay integration, you'd validate signature and parse their JSON.
-    """
     sub = db.query(Subscription).filter(Subscription.id == payload.subscription_id).first()
     if not sub:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found.")
+        raise HTTPException(status_code=404, detail="Subscription not found.")
 
-    # Very naive stub: mark active if invoice_paid
     if payload.event_type == "invoice_paid":
         sub.status = "active"
-        # Optionally set current_period_end here
+
+        # Give tokens based on plan
+        user = db.query(User).filter(User.id == sub.user_id).first()
+        plan = db.query(Plan).filter(Plan.id == sub.plan_id).first()
+
+        if plan.code == "starter":
+            user.tokens_remaining += 10000
+        elif plan.code == "pro":
+            user.tokens_remaining += 50000
+        elif plan.code == "business":
+            user.tokens_remaining += 200000
+
     elif payload.event_type == "subscription_canceled":
         sub.status = "canceled"
-
-    db.add(sub)
 
     event = PaymentEvent(
         subscription_id=sub.id,
