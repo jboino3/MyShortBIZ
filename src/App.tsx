@@ -12,6 +12,8 @@ import Solutions from "./pages/Solutions";
 import Pricing from "./pages/Pricing";
 import Resources from "./pages/Resources";
 import Contact from "./pages/Contact";
+//import Blog from "./Blog/Blog"; // Pointing to the new backend-ready folder
+//import Bio from "./Bio/Bio";   // Pointing to the new backend-ready folder
 
 
 // Extra sections using existing folder names (each should export a default page component)
@@ -19,13 +21,13 @@ import CreatorHome from "./CreatorHome/CreatorHome";
 import Shop from "./CreatorHome/Shop";
 import Store from "./CreatorHome/Store";
 import Studio from "./CreatorHome/Studio";
-import Blog from "./CreatorHome/Blog";
+import Blog from "./Blog/Blog";
 import Social from "./CreatorHome/Social";
 import LinkPage from "./CreatorHome/Link";    
 import Video from "./CreatorHome/Video";
 import Thesis from "./CreatorHome/Thesis";
 import CV from "./CreatorHome/CV";
-import Bio from "./CreatorHome/Bio";
+import Bio from "./Bio/Bio";
 import Misc from "./Misc/Misc";
 import SignIn from "./AccountCreationAndPayment/SignIn";
 import Settings from "./CreatorHome/Settings";

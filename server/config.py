@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv() 
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+OPENAI_API_KEY = "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"
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
 
 if not OPENAI_API_KEY:
