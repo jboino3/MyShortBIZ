@@ -1,6 +1,5 @@
 # server/services/blog_service.py
 
-
 import os
 import markdown as md
 from dotenv import load_dotenv
@@ -40,6 +39,19 @@ def estimate_token_cost(word_count: int, features: BlogFeatures) -> int:
 
 
 def build_prompt(req: BlogGenerateRequest) -> str:
+
+    if hasattr(req, 'existing_content') and req.existing_content:
+        return f"""
+        You are an editor. Below is a draft blog post:
+        
+        "{req.existing_content}"
+        
+        The user wants to make these adjustments: "{req.refinement_instruction}"
+        
+        Rewrite the post keeping the original structure but applying those specific changes. 
+        Output ONLY the updated Markdown.
+        """.strip()
+
     flags = []
     if req.features.meta_description:
         flags.append("- Include an SEO meta description (155–160 chars).")
@@ -57,6 +69,8 @@ def build_prompt(req: BlogGenerateRequest) -> str:
         flags.append("- Suggest 2 image prompts (featured + inline). Do not generate images.")
 
     keyword_line = f"Primary SEO keyword: {req.seo_keyword}\n" if req.seo_keyword else ""
+    keyword_list = getattr(req, 'all_keywords', [])
+    keyword_line = f"Mandatory keywords to include: {', '.join(keyword_list)}\n" if keyword_list else ""
 
     return f"""
 You are a professional SEO content writer for a business productivity SaaS called "MyShortBIZ".
@@ -64,6 +78,7 @@ You are a professional SEO content writer for a business productivity SaaS calle
 Write an engaging blog post in clean Markdown.
 
 Topic: {req.topic}
+Specific Instructions: {getattr(req, 'description', 'Write a general post about the topic.')}
 Target audience: {req.audience}
 Tone: {req.tone}
 {keyword_line}
@@ -71,6 +86,7 @@ Length: approximately {req.word_count} words.
 
 Requirements:
 - Use H1 for the title, then H2/H3 structure.
+- You MUST follow the 'Specific Instructions' provided above strictly.
 - Hooky intro, practical value, and a short conclusion.
 {chr(10).join(flags)}
 

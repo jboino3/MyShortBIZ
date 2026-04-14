@@ -16,11 +16,15 @@ class BlogFeatures(BaseModel):
 
 class BlogGenerateRequest(BaseModel):
     topic: str = Field(..., min_length=3, max_length=200)
+    description: str = ""
+    all_keywords: list = []
     audience: str = Field("General audience", max_length=200)
     tone: str = Field("Professional", max_length=50)
     seo_keyword: Optional[str] = Field(None, max_length=80)
     word_count: int = Field(800, ge=300, le=2500)
     features: BlogFeatures = BlogFeatures()
+    existing_content: str = "" 
+    refinement_instruction: str = ""
 
 
 class BlogGenerateResponse(BaseModel):
