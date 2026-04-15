@@ -1,103 +1,167 @@
-// src/api/api.ts
+const API_BASE = import.meta.env.VITE_API_URL;
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+// TEMPORARY TOKEN (replace later with login flow)
+let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0NzdhMjQ0Yi1mNTQ1LTRiMjUtYTEwNC1kMjQyOTg2MmY1NzUiLCJleHAiOjE3NzYzMDM1NzR9.H3jg8LLSY7PEt_SX69CFSCrxBBA8SezMQqAd76GmRro";
 
-const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0NzdhMjQ0Yi1mNTQ1LTRiMjUtYTEwNC1kMjQyOTg2MmY1NzUiLCJleHAiOjE3NzYyODU5MzJ9.FAnU5FReWC0xVTIaA_evYIKVFNMo_rYUyVQCHjtbF6Y";
+// later your teammate will replace this easily
+export function setToken(newToken: string) {
+  token = newToken;
+}
 
-// Helper to get auth token
-const getAuthHeaders = () => {
-  return {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${token}`,
-  };
-};
+async function request(endpoint: string, options: RequestInit = {}) {
+  const res = await fetch(`${API_BASE}${endpoint}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+      ...(options.headers || {}),
+    },
+  });
 
-// Generic request handler (fixes your JSON.parse crash)
-async function handleResponse(res: Response) {
   if (!res.ok) {
-    let errorMessage = "Something went wrong";
-
-    try {
-      const err = await res.json();
-      errorMessage = err.detail || errorMessage;
-    } catch {
-      // no JSON body
-    }
-
-    throw new Error(errorMessage);
+    const err = await res.json();
+    throw new Error(err.detail || "API Error");
   }
 
-  // Prevent "unexpected end of JSON input"
-  if (res.status === 204) return null;
-
-  const text = await res.text();
-
-if (!text) {
-  throw new Error("Empty response from server");
+  return res.json();
 }
 
-try {
-  return JSON.parse(text);
-} catch (err) {
-  console.error("Raw response:", text);
-  throw new Error("Invalid JSON response from backend");
-}
-}
+// ---- API FUNCTIONS ----
 
-//////////////////////////////////////////////////////
-// 🧠 AI CV APIs
-//////////////////////////////////////////////////////
-
-export const generateCV = async (data: any) => {
-  const res = await fetch(`${API_BASE_URL}/ai/cv/generate`, {
+export const createLink = (data: any) =>
+  request("/ai/link/generate", {
     method: "POST",
-    headers: getAuthHeaders(),
     body: JSON.stringify(data),
   });
 
-  return handleResponse(res);
-};
+export const getMyLinks = () =>
+  request("/ai/link/my");
 
-//////////////////////////////////////////////////////
-// 🔗 AI LINK APIs
-//////////////////////////////////////////////////////
 
-export const generateLink = async (data: any) => {
-  const res = await fetch(`${API_BASE_URL}/ai/link/generate`, {
-    method: "POST",
-    headers: getAuthHeaders(),
-    body: JSON.stringify(data),
-  });
+// // src/api/api.ts
 
-  return handleResponse(res);
-};
+// const API_BASE_URL = import.meta.env.VITE_API_URL;
 
-export const getMyLinks = async () => {
-  const res = await fetch(`${API_BASE_URL}/ai/link/my`, {
-    method: "GET",
-    headers: getAuthHeaders(),
-  });
+// let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0NzdhMjQ0Yi1mNTQ1LTRiMjUtYTEwNC1kMjQyOTg2MmY1NzUiLCJleHAiOjE3NzYyODU5MzJ9.FAnU5FReWC0xVTIaA_evYIKVFNMo_rYUyVQCHjtbF6Y";
 
-  return handleResponse(res);
-};
+// // Helper to get auth token
+// const getAuthHeaders = () => {
+//   return {
+//     "Content-Type": "application/json",
+//     Authorization: `Bearer ${token}`,
+//   };
+// };
 
-export const getLinkAnalytics = async () => {
-  const res = await fetch(`${API_BASE_URL}/ai/link/analytics`, {
-    method: "GET",
-    headers: getAuthHeaders(),
-  });
+// // Generic request handler (fixes your JSON.parse crash)
+// async function handleResponse(res: Response) {
+//   if (!res.ok) {
+//     let errorMessage = "Something went wrong";
 
-  return handleResponse(res);
-};
+//     try {
+//       const err = await res.json();
+//       errorMessage = err.detail || errorMessage;
+//     } catch {
+//       // no JSON body
+//     }
 
-export const getSingleLinkAnalytics = async (linkId: number) => {
-  const res = await fetch(
-    `${API_BASE_URL}/ai/link/analytics/${linkId}`,
-    {
-      method: "GET",
-      headers: getAuthHeaders(),
-    }
-  );
+//     throw new Error(errorMessage);
+//   }
 
-  return handleResponse(res);
-};
+//   // Prevent "unexpected end of JSON input"
+//   if (res.status === 204) return null;
+
+//   const text = await res.text();
+
+// if (!text) {
+//   throw new Error("Empty response from server");
+// }
+
+// try {
+//   return JSON.parse(text);
+// } catch (err) {
+//   console.error("Raw response:", text);
+//   throw new Error("Invalid JSON response from backend");
+// }
+// }
+
+// //////////////////////////////////////////////////////
+// // 🧠 AI CV APIs
+// //////////////////////////////////////////////////////
+
+// export const generateCV = async (data: any) => {
+//   const res = await fetch(`${API_BASE_URL}/ai/cv/generate`, {
+//     method: "POST",
+//     headers: getAuthHeaders(),
+//     body: JSON.stringify(data),
+//   });
+
+//   return handleResponse(res);
+// };
+
+// //////////////////////////////////////////////////////
+// // 🔗 AI LINK APIs
+// //////////////////////////////////////////////////////
+
+
+// async function generateLink() {
+//   const res = await fetch("http://127.0.0.1:8000/ai/link/generate", {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//       // only needed if you re-enable auth later:
+//       // "Authorization": "Bearer <token>"
+//     },
+//     body: JSON.stringify({
+//       original_url: "https://example.com",
+//       destination_summary: "test",
+//       audience: "users",
+//       tone: "casual",
+//       goal: "increase clicks",
+//       platform: "web"
+//     })
+//   });
+
+//   const data = await res.json();
+//   console.log(data);
+//   return data;
+// }
+
+// // export const generateLink = async (data: any) => {
+// //   const res = await fetch(`${API_BASE_URL}/ai/link/generate`, {
+// //     method: "POST",
+// //     headers: getAuthHeaders(),
+// //     body: JSON.stringify(data),
+// //   });
+
+// //   return handleResponse(res);
+// // };
+
+// export const getMyLinks = async () => {
+//   const res = await fetch(`${API_BASE_URL}/ai/link/my`, {
+//     method: "GET",
+//     headers: getAuthHeaders(),
+//   });
+
+//   return handleResponse(res);
+// };
+
+// export const getLinkAnalytics = async () => {
+//   const res = await fetch(`${API_BASE_URL}/ai/link/analytics`, {
+//     method: "GET",
+//     headers: getAuthHeaders(),
+//   });
+
+//   return handleResponse(res);
+// };
+
+// export const getSingleLinkAnalytics = async (linkId: number) => {
+//   const res = await fetch(
+//     `${API_BASE_URL}/ai/link/analytics/${linkId}`,
+//     {
+//       method: "GET",
+//       headers: getAuthHeaders(),
+//     }
+//   );
+
+//   return handleResponse(res);
+// };
