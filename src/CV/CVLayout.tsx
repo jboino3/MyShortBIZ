@@ -6,8 +6,7 @@ import { Outlet } from "react-router-dom";
 function CVLayout() {
   return (
     <div className="cv-page">
-      {/* Sidebar if you ever want it */}
-      {/* <Sidebar /> */}
+
 
       <main className="cv-page__content">
         <Outlet /> {/* renders child pages like landing or builder */}

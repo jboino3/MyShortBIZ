@@ -13,6 +13,12 @@ from schemas.link_analytics import (
     ShortLinkAnalyticsSummary,
 )
 
+# These imports used in debug/users endpoint
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+from db import get_db
+from models import User
+
 router = APIRouter(tags=["AI Link"])
 
 
@@ -113,3 +119,7 @@ def get_single_link_analytics(
         raise HTTPException(status_code=404, detail="Short link not found")
 
     return link
+
+@router.get("/debug/users")
+def debug_users(db: Session = Depends(get_db)):
+    return db.query(User).all()

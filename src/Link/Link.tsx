@@ -29,7 +29,7 @@ type AnalyticsSummary = {
   links: MyLink[]
 }
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'
+const API_BASE = import.meta.env.VITE_API_BASE_URL
 
 const LINK_GENERATE_ENDPOINT = `${API_BASE}/ai/link/generate`
 const MY_LINKS_ENDPOINT = `${API_BASE}/ai/link/my`
@@ -54,6 +54,30 @@ function Link() {
   const [analytics, setAnalytics] = useState<AnalyticsSummary | null>(null)
 
   const getToken = () => localStorage.getItem('myshortbiz_token')
+
+
+  async function generateLink() {
+  const res = await fetch("http://127.0.0.1:8000/ai/link/generate", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      // only needed if you re-enable auth later:
+      // "Authorization": "Bearer <token>"
+    },
+    body: JSON.stringify({
+      original_url: "https://example.com",
+      destination_summary: "test",
+      audience: "users",
+      tone: "casual",
+      goal: "increase clicks",
+      platform: "web"
+    })
+  });
+
+  const data = await res.json();
+  console.log(data);
+  return data;
+}
 
   const fetchMyLinksAndAnalytics = async () => {
     const token = getToken()
