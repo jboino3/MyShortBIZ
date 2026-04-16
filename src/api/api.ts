@@ -1,7 +1,7 @@
 const API_BASE = import.meta.env.VITE_API_URL;
 
 // TEMPORARY TOKEN (replace later with login flow)
-let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0NzdhMjQ0Yi1mNTQ1LTRiMjUtYTEwNC1kMjQyOTg2MmY1NzUiLCJleHAiOjE3NzYzMDM1NzR9.H3jg8LLSY7PEt_SX69CFSCrxBBA8SezMQqAd76GmRro";
+let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0NzdhMjQ0Yi1mNTQ1LTRiMjUtYTEwNC1kMjQyOTg2MmY1NzUiLCJleHAiOjE3NzY0MDc4NjJ9.4v92Y5Own4VSDZ0Nad_hA1bmrPO6jYSgE7jjwM1sifQ";
 
 // later your teammate will replace this easily
 export function setToken(newToken: string) {
@@ -37,6 +37,8 @@ export const createLink = (data: any) =>
 export const getMyLinks = () =>
   request("/ai/link/my");
 
+export const getAnalytics = () =>
+  request("/ai/link/analytics");
 
 // // src/api/api.ts
 

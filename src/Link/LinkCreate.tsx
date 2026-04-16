@@ -19,44 +19,59 @@ function LinkCreate() {
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
+  e.preventDefault();
+  setError("");
+  setLoading(true);
 
-    try {
-      const data = await createLink({
-        original_url: url,
-        destination_summary: title,
-        audience: "general",
-        tone: "casual",
-        goal: "increase clicks",
-        platform: "web",
-        custom_slug: slugOption === "custom" ? customSlug : "",
-      });
+  try {
+    const cleanUrl = url.trim();
 
-      const newLink = {
-        id: data.id,
-        short: data.short_url,
-        original: data.original_url,
-        created: new Date().toLocaleDateString(),
-        clicks: 0,
-        type: "standard",
-      };
-
-      setLinks([newLink, ...links]);
-
-      // optional reset
-      setUrl("");
-      setTitle("");
-      setCustomSlug("");
-      setSlugOption("auto");
-
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    // ✅ IMPORTANT VALIDATION
+    if (!cleanUrl.startsWith("http://") && !cleanUrl.startsWith("https://")) {
+      throw new Error("URL must start with http:// or https://");
     }
-  };
+
+    if (slugOption === "custom" && customSlug.trim() === "") {
+      setError("Custom slug is required when selected.");
+      setLoading(false);
+      return;
+    }
+
+    const data = await createLink({
+      original_url: cleanUrl,
+      destination_summary: title || null,
+      audience: "general",
+      tone: "Professional", // safer default
+      goal: "increase clicks",
+      platform: "web",
+      custom_slug: slugOption === "custom" && customSlug.trim() !== ""
+        ? customSlug.trim()
+        : undefined,
+    });
+
+    const newLink = {
+      id: data.id,
+      short: data.short_url,
+      original: data.original_url,
+      title: data.title,
+      created: new Date().toLocaleDateString(),
+      clicks: 0,
+      type: "standard",
+    };
+
+    setLinks((prev) => [newLink, ...prev]);
+
+    setUrl("");
+    setTitle("");
+    setCustomSlug("");
+    setSlugOption("auto");
+
+  } catch (err: any) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const filteredLinks = links.filter((link) => {
     const matchesSearch =
@@ -89,7 +104,7 @@ function LinkCreate() {
 
             <div className="form-card-body">
 
-              <label className="form-label">Title (optional)</label>
+              <label className="form-label" >Title (optional)</label>
               <input
                 type="text"
                 className="form-input"
@@ -152,11 +167,21 @@ function LinkCreate() {
               {slugOption === "custom" && (
                 <input
                   type="text"
-                  className="form-input small-input"
+                  className={`form-input small-input ${
+                    slugOption === "custom" && customSlug.trim() === ""
+                      ? "input-error"
+                      : ""
+                  }`}
                   placeholder="summer-sale"
                   value={customSlug}
                   onChange={(e) => setCustomSlug(e.target.value)}
+                  required
                 />
+              )}
+              {slugOption === "custom" && customSlug.trim() === "" && (
+                <p style={{ color: "red", fontSize: "12px" }}>
+                  Custom slug is required
+                </p>
               )}
             </div>
           </section>

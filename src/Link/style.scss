@@ -284,6 +284,11 @@
   position: relative;
 }
 
+.input-error {
+  border: 2px solid red;
+  outline: none;
+}
+
 /* Hide default checkbox */
 .toggle-switch input {
   opacity: 0;
