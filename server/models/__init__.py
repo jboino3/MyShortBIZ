@@ -30,6 +30,7 @@ class User(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     subscriptions = relationship("Subscription", back_populates="user", cascade="all, delete-orphan")
+    thesis_projects = relationship("ThesisProject", back_populates="user", cascade="all, delete-orphan")
 
 
 # ------------------------
@@ -156,6 +157,55 @@ class LinkClick(Base):
     block = relationship("Block", back_populates="clicks")
 
 
+# ------------------------
+# Thesis Voice Agent Demo
+# ------------------------
+
+class ThesisProject(Base):
+    __tablename__ = "thesis_projects"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), unique=True, index=True, nullable=False)
+    active_step = Column(String, default="overview", nullable=False)
+    demo_mode = Column(Boolean, default=True, nullable=False)
+    credits_required = Column(Boolean, default=False, nullable=False)
+    voice_profile_name = Column(String, nullable=True)
+    phrase_progress_json = Column(Text, nullable=True)
+    consent_json = Column(Text, nullable=True)
+    voice_profile_json = Column(Text, nullable=True)
+    agent_config_json = Column(Text, nullable=True)
+    phone_config_json = Column(Text, nullable=True)
+    test_results_json = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+
+    user = relationship("User", back_populates="thesis_projects")
+
+
+class TelephonySession(Base):
+    __tablename__ = "telephony_sessions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    provider = Column(String, nullable=False, default="vapi", index=True)
+    call_id = Column(String, nullable=False, unique=True, index=True)
+    mode = Column(String, nullable=False, default="direct", index=True)
+    status = Column(String, nullable=False, default="queued", index=True)
+    user_id = Column(String, ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True)
+    thesis_project_id = Column(Integer, ForeignKey("thesis_projects.id", ondelete="SET NULL"), nullable=True, index=True)
+    assistant_id = Column(String, nullable=True)
+    phone_number_id = Column(String, nullable=True)
+    inbound_number = Column(String, nullable=True)
+    customer_number = Column(String, nullable=True)
+    last_event_type = Column(String, nullable=True)
+    session_metadata_json = Column(Text, nullable=True)
+    messages_json = Column(Text, nullable=True)
+    transcript_json = Column(Text, nullable=True)
+    artifacts_json = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False, index=True)
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+    ended_at = Column(DateTime(timezone=True), nullable=True)
+
+
 __all__ = [
     "User",
     "Plan",
@@ -165,4 +215,6 @@ __all__ = [
     "Block",
     "PageView",
     "LinkClick",
+    "ThesisProject",
+    "TelephonySession",
 ]

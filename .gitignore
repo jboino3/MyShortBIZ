@@ -26,3 +26,12 @@ eslint.config.js
 package-lock.json
 package.json
 tsconfig.node.json
+
+# Local generated/runtime artifacts
+.codex
+.codex/
+call_recordings/
+testing_audio/
+server/.cache/
+server/generated_audio/
+*.db

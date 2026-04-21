@@ -1,23 +1,30 @@
+import json
 from datetime import datetime
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, HttpUrl
 from sqlalchemy.orm import Session
 
 from db import get_db
 from models import Plan, Subscription, PaymentEvent
+from services.btcpay_service import btcpay_service
+from services.stripe_service import stripe_service
 from .auth import get_current_user, UserOut
 
 router = APIRouter(prefix="/payments", tags=["payments"])
 
 
-# ------------------------
-# Pydantic models
-# ------------------------
-
 class CheckoutRequest(BaseModel):
     plan_slug: str
+
+
+class CardCheckoutRequest(BaseModel):
+    plan_slug: str
+    success_url: HttpUrl
+    cancel_url: HttpUrl
+    customer_email: Optional[EmailStr] = None
+    cardholder_name: Optional[str] = None
 
 
 class CheckoutResponse(BaseModel):
@@ -44,12 +51,8 @@ class PaymentEventOut(BaseModel):
 
 class WebhookStubPayload(BaseModel):
     subscription_id: int
-    event_type: str = "invoice_paid"  # for now
+    event_type: str = "invoice_paid"
 
-
-# ------------------------
-# Helpers
-# ------------------------
 
 def _require_admin(user: UserOut):
     if user.role != "admin":
@@ -79,31 +82,26 @@ def _event_to_schema(ev: PaymentEvent) -> PaymentEventOut:
     )
 
 
-# ------------------------
-# Checkout (stub)
-# ------------------------
-
-@router.post("/checkout", response_model=CheckoutResponse)
-def checkout(
-    payload: CheckoutRequest,
-    current_user: UserOut = Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
-    """
-    Create a pending subscription and return a fake BTCPay URL.
-    """
-    plan = db.query(Plan).filter(Plan.slug == payload.plan_slug, Plan.is_active.is_(True)).first()
+def _get_plan_or_404(db: Session, plan_slug: str) -> Plan:
+    plan = db.query(Plan).filter(Plan.slug == plan_slug, Plan.is_active.is_(True)).first()
     if not plan:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Plan not found or inactive.",
         )
+    return plan
 
-    # Optional: ensure user doesn't already have an active sub for this plan
+
+def _create_pending_subscription(
+    db: Session,
+    user_id: str,
+    plan: Plan,
+    external_invoice_id: Optional[str],
+) -> Subscription:
     existing_active = (
         db.query(Subscription)
         .filter(
-            Subscription.user_id == current_user.id,
+            Subscription.user_id == user_id,
             Subscription.plan_id == plan.id,
             Subscription.status == "active",
         )
@@ -115,27 +113,43 @@ def checkout(
             detail="You already have an active subscription for this plan.",
         )
 
-    # Create subscription in pending status
-    fake_invoice_id = f"INV-{current_user.id[:8]}-{plan.slug}-{int(datetime.utcnow().timestamp())}"
-
     sub = Subscription(
-        user_id=current_user.id,
+        user_id=user_id,
         plan_id=plan.id,
         status="pending",
-        btcpay_invoice_id=fake_invoice_id,
+        btcpay_invoice_id=external_invoice_id,
     )
     db.add(sub)
     db.commit()
     db.refresh(sub)
+    return sub
 
-    # Log checkout event
+
+def _log_payment_event(db: Session, subscription_id: int, event_type: str, payload: Optional[dict] = None):
     event = PaymentEvent(
-        subscription_id=sub.id,
-        event_type="checkout_created",
-        raw_payload=None,
+        subscription_id=subscription_id,
+        event_type=event_type,
+        raw_payload=json.dumps(payload) if payload else None,
     )
     db.add(event)
     db.commit()
+
+
+@router.post("/checkout", response_model=CheckoutResponse)
+def checkout(
+    payload: CheckoutRequest,
+    current_user: UserOut = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Legacy checkout endpoint preserved as-is for backward compatibility.
+    """
+    plan = _get_plan_or_404(db, payload.plan_slug)
+
+    fake_invoice_id = f"INV-{current_user.id[:8]}-{plan.slug}-{int(datetime.utcnow().timestamp())}"
+    sub = _create_pending_subscription(db, current_user.id, plan, fake_invoice_id)
+
+    _log_payment_event(db, sub.id, "checkout_created")
 
     checkout_url = f"https://btcpay.example.com/invoice/{fake_invoice_id}"
 
@@ -146,27 +160,97 @@ def checkout(
     )
 
 
-# ------------------------
-# Webhook stub
-# ------------------------
+@router.post("/checkout/bitcoin", response_model=CheckoutResponse)
+def checkout_bitcoin(
+    payload: CheckoutRequest,
+    current_user: UserOut = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    plan = _get_plan_or_404(db, payload.plan_slug)
+
+    amount = float(plan.price_cents) / 100.0
+    invoice = btcpay_service.create_invoice(
+        amount=amount,
+        currency=plan.currency,
+        metadata={"user_id": current_user.id, "plan_slug": plan.slug},
+    )
+
+    sub = _create_pending_subscription(db, current_user.id, plan, invoice.id)
+
+    _log_payment_event(
+        db,
+        sub.id,
+        "bitcoin_checkout_created",
+        payload={
+            "invoice_id": invoice.id,
+            "checkout_url": invoice.checkout_url,
+            "amount": invoice.amount,
+            "currency": invoice.currency,
+        },
+    )
+
+    return CheckoutResponse(
+        subscription_id=sub.id,
+        checkout_url=invoice.checkout_url,
+        status=sub.status,
+    )
+
+
+@router.post("/checkout/card", response_model=CheckoutResponse)
+def checkout_card(
+    payload: CardCheckoutRequest,
+    current_user: UserOut = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    plan = _get_plan_or_404(db, payload.plan_slug)
+
+    try:
+        session = stripe_service.create_checkout_session(
+            product_name=f"{plan.name} Plan",
+            amount_cents=plan.price_cents,
+            currency=plan.currency,
+            success_url=str(payload.success_url),
+            cancel_url=str(payload.cancel_url),
+            customer_email=payload.customer_email,
+            metadata={
+                "user_id": current_user.id,
+                "plan_slug": plan.slug,
+                "cardholder_name": payload.cardholder_name or "",
+            },
+        )
+    except RuntimeError as exc:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
+
+    sub = _create_pending_subscription(db, current_user.id, plan, None)
+
+    _log_payment_event(
+        db,
+        sub.id,
+        "card_checkout_created",
+        payload={
+            "stripe_session_id": session.id,
+            "checkout_url": session.url,
+        },
+    )
+
+    return CheckoutResponse(
+        subscription_id=sub.id,
+        checkout_url=session.url,
+        status=sub.status,
+    )
+
 
 @router.post("/webhook", status_code=status.HTTP_202_ACCEPTED)
 def webhook_stub(
     payload: WebhookStubPayload,
     db: Session = Depends(get_db),
 ):
-    """
-    Stub webhook: flip subscription status based on event_type.
-    In real BTCPay integration, you'd validate signature and parse their JSON.
-    """
     sub = db.query(Subscription).filter(Subscription.id == payload.subscription_id).first()
     if not sub:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found.")
 
-    # Very naive stub: mark active if invoice_paid
     if payload.event_type == "invoice_paid":
         sub.status = "active"
-        # Optionally set current_period_end here
     elif payload.event_type == "subscription_canceled":
         sub.status = "canceled"
 
@@ -183,10 +267,6 @@ def webhook_stub(
     return {"ok": True}
 
 
-# ------------------------
-# User-facing endpoints
-# ------------------------
-
 @router.get("/my-subscriptions", response_model=List[SubscriptionOut])
 def get_my_subscriptions(
     current_user: UserOut = Depends(get_current_user),
@@ -201,10 +281,6 @@ def get_my_subscriptions(
     )
     return [_subscription_to_schema(s) for s in subs]
 
-
-# ------------------------
-# Admin endpoints
-# ------------------------
 
 @router.get("/subscriptions", response_model=List[SubscriptionOut])
 def list_all_subscriptions(

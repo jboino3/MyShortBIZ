@@ -1,14 +1,27 @@
+from pathlib import Path
+from threading import Thread
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+load_dotenv(Path(__file__).resolve().with_name(".env"))
+load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
 from routers.auth import router as AuthRouter
 from routers.contact import router as ContactRouter
 from routers.pricing import router as PricingRouter
 from routers.payments import router as PaymentsRouter
 from routers.content import router as ContentRouter
+from routers.thesis import router as ThesisRouter
+from routers.vapi import router as VapiRouter
 
-from db import Base, engine
+from db import Base, SessionLocal, engine
 import models  # noqa: F401  (make sure models are imported so metadata is populated)
+from services.telephony_session_service import telephony_session_service
+from services.thesis_agent_service import thesis_agent_service
+from services.thesis_generation_service import thesis_generation_service
+from services.phone_speech_service import normalize_phone_tts_text
+from services.thesis_voice_service import thesis_voice_service
 
 app = FastAPI(
     title="MyShortBIZ API",
@@ -23,11 +36,52 @@ origins = ["http://localhost:5173"]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+def _prewarm_exact_demo_voice():
+    db = SessionLocal()
+    try:
+        context = telephony_session_service.build_call_context(db)
+        prompt_path = context.get("voice_prompt_path")
+        agent_config = context.get("agent_config", {})
+        phone_config = context.get("phone_config", {})
+        user_id = context.get("user_id")
+        project_id = context.get("thesis_project_id")
+        greeting = agent_config.get("greeting_script")
+        business_name = agent_config.get("business_name", "MyShortBIZ")
+        if prompt_path and user_id:
+            warm_texts = thesis_agent_service.demo_phone_replies(
+                agent_config=agent_config,
+                phone_config=phone_config,
+                business_name=business_name,
+                prompts=thesis_agent_service.critical_demo_phone_prompts(),
+            )
+            if greeting:
+                warm_texts = list(dict.fromkeys([greeting, *warm_texts]))
+
+            for text in warm_texts:
+                thesis_voice_service.generate_phone_pcm_local(
+                    user_id,
+                    prompt_path,
+                    normalize_phone_tts_text(text),
+                    8000,
+                    variant=thesis_voice_service.conversation_model_variant,
+                )
+
+    except Exception:
+        pass
+    finally:
+        db.close()
+
+
+@app.on_event("startup")
+def startup_event():
+    Thread(target=_prewarm_exact_demo_voice, daemon=True).start()
 
 
 @app.get("/")
@@ -47,3 +101,5 @@ app.include_router(ContactRouter)
 app.include_router(PricingRouter)
 app.include_router(PaymentsRouter)
 app.include_router(ContentRouter)
+app.include_router(ThesisRouter)
+app.include_router(VapiRouter)
