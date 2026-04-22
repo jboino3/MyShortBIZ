@@ -35,10 +35,6 @@ function DisappearingNotes() {
     setNotes([newNote, ...notes]);
   };
 
-  const copyLink = (link: string) => {
-    navigator.clipboard.writeText(link);
-  };
-
   return (
     <main className="link-page-layout">
 
@@ -89,7 +85,7 @@ function DisappearingNotes() {
               <div className="nested-section">
                 <label className="form-label">Maximum Views</label>
                 <p>The note will expire after the number of views specified.</p>
-                <select className="form-select small-input">
+                <select className="form-select small-input" value={viewLimit} onChange={(e) => setViewLimit(e.target.value)}>
                   <option value="1">1 View</option>
                   <option value="2">2 Views</option>
                   <option value="3">3 Views</option>

@@ -33,16 +33,6 @@ const LS_PRODUCTS = "myshortbiz.shop.products.v2";
 const LS_CART = "myshortbiz.shop.cart.v2";
 const LS_CREATORS = "myshortbiz.shop.creators.v2";
 
-const CAT_COLOR: Record<ProductCategory, string> = {
-    Digital: "#7c3aed",
-    Physical: "#0ea5e9",
-    Service: "#059669",
-};
-const CAT_BG: Record<ProductCategory, string> = {
-    Digital: "#f3f0ff",
-    Physical: "#e0f5ff",
-    Service: "#ecfdf5",
-};
 const CAT_EMOJI: Record<ProductCategory, string> = {
     Digital: "💾", Physical: "📦", Service: "🤝",
 };
@@ -130,7 +120,6 @@ export default function Shop() {
 
     const featured = useMemo(() => products.filter((p) => p.featured && p.status === "active"), [products]);
     const myProducts = useMemo(() => products.filter((p) => p.creatorId === "you"), [products]);
-    const cartCount = useMemo(() => cart.reduce((s, i) => s + i.qty, 0), [cart]);
     const cartTotal = useMemo(() =>
         cart.reduce((s, i) => s + (byId.get(i.productId)?.price ?? 0) * i.qty, 0),
         [cart, byId]
@@ -140,13 +129,6 @@ export default function Shop() {
     function persist(p: Product[], c: CartItem[]) {
         localStorage.setItem(LS_PRODUCTS, JSON.stringify(p));
         localStorage.setItem(LS_CART, JSON.stringify(c));
-    }
-    function addToCart(productId: string) {
-        const e = cart.find((c) => c.productId === productId);
-        const next = e
-            ? cart.map((c) => (c.productId === productId ? { ...c, qty: c.qty + 1 } : c))
-            : [...cart, { productId, qty: 1 }];
-        setCart(next); persist(products, next);
     }
     function setQty(productId: string, qty: number) {
         const next = cart.map((c) => (c.productId === productId ? { ...c, qty } : c)).filter((c) => c.qty > 0);
