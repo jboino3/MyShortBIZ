@@ -1,7 +1,6 @@
 // src/CreatorHome/Blog.tsx
 import "./Blog.scss";
-import { useState } from 'react';
-import { API_BASE } from "../lib/apiBase";
+import React, { useState } from 'react';
 
 export default function Blog() {
 
@@ -34,11 +33,12 @@ export default function Blog() {
   };
 
   // --- BACKEND LOGIC ---
+  const [refinementText, setRefinementText] = useState("");
   const handleFinalizeAI = async () => {
   setLoading(true);
   const token = localStorage.getItem('myshortbiz_token');
 
-  const wordCount = "500";
+  const [wordCount, setWordCount] = useState("500");
 
   // map frontend
   const payload = {
@@ -53,7 +53,7 @@ export default function Blog() {
   };
 
   try {
-    const response = await fetch(`${API_BASE}/api/blog/generate`, {
+    const response = await fetch("http://localhost:8000/api/blog/generate", {
       method: "POST",
       headers: { 
         "Content-Type": "application/json",
@@ -96,7 +96,7 @@ export default function Blog() {
   };
 
   try {
-    const response = await fetch(`${API_BASE}/api/blog/generate`, {
+    const response = await fetch("http://localhost:8000/api/blog/generate", {
       method: "POST",
       headers: { 
         "Content-Type": "application/json",

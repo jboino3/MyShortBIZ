@@ -24,10 +24,10 @@ router = APIRouter(prefix="/api/blog", tags=["Blog"])
 @router.post("/generate", response_model=BlogGenerateResponse)
 def generate_blog(
     req: BlogGenerateRequest,
-    current_user: UserOut = Depends(get_current_user),
+    # current_user: UserOut = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    user = db.query(User).filter(User.id == current_user.id).first()
+    user = db.query(User).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
