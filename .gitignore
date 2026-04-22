@@ -35,3 +35,4 @@ testing_audio/
 server/.cache/
 server/generated_audio/
 *.db
+*:Zone.Identifier
