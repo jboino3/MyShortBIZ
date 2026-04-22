@@ -20,7 +20,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 SECRET_KEY = "CHANGE_ME_SUPER_SECRET_KEY"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
+ACCESS_TOKEN_EXPIRE_MINUTES = 60  # 1 hour
 
 pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
 

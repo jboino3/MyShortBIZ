@@ -10,6 +10,42 @@ from .auth import get_current_user, UserOut
 
 router = APIRouter(prefix="/pricing", tags=["pricing"])
 
+DEFAULT_PLANS = [
+    {
+        "name": "Starter",
+        "slug": "starter-10",
+        "description": "Entry plan for creators getting started.",
+        "price_cents": 1000,
+        "currency": "USD",
+        "interval": "monthly",
+        "max_links": 10,
+        "max_pages": 1,
+        "is_active": True,
+    },
+    {
+        "name": "Growth",
+        "slug": "growth-30",
+        "description": "Expanded plan for growing creator businesses.",
+        "price_cents": 3000,
+        "currency": "USD",
+        "interval": "monthly",
+        "max_links": 50,
+        "max_pages": 5,
+        "is_active": True,
+    },
+    {
+        "name": "Scale",
+        "slug": "scale-100",
+        "description": "High-capacity plan for established creators.",
+        "price_cents": 10000,
+        "currency": "USD",
+        "interval": "monthly",
+        "max_links": None,
+        "max_pages": None,
+        "is_active": True,
+    },
+]
+
 
 # ------------------------
 # Pydantic models
@@ -74,6 +110,20 @@ def _plan_to_schema(plan: Plan) -> PlanOut:
     )
 
 
+def _ensure_default_plans(db: Session) -> None:
+    existing_slugs = {
+        slug for (slug,) in db.query(Plan.slug).filter(Plan.slug.in_([plan["slug"] for plan in DEFAULT_PLANS]))
+    }
+    missing_plans = [plan for plan in DEFAULT_PLANS if plan["slug"] not in existing_slugs]
+    if not missing_plans:
+        return
+
+    for plan_data in missing_plans:
+        db.add(Plan(**plan_data))
+
+    db.commit()
+
+
 # ------------------------
 # Public endpoints
 # ------------------------
@@ -83,6 +133,7 @@ def list_active_plans(db: Session = Depends(get_db)):
     """
     Public: list all active plans.
     """
+    _ensure_default_plans(db)
     plans = db.query(Plan).filter(Plan.is_active.is_(True)).order_by(Plan.price_cents).all()
     return [_plan_to_schema(p) for p in plans]
 

@@ -1,4 +1,4 @@
-/* ─── Top utility bar ───────────────────────────── */
+/* Top utility bar */
 .topbar {
   position: sticky;
   top: 0;
@@ -14,11 +14,13 @@
   .topbar__right {
     display: flex;
     gap: 12px;
+    align-items: center;
   }
 
   .topbar__left {
     margin-right: auto;
   }
+
   .topbar__right {
     margin-left: auto;
   }
@@ -34,12 +36,21 @@
     text-decoration: none;
 
     &:hover {
-      color: #7a3cff; /* subtle hover accent */
+      color: #7a3cff;
     }
+  }
+
+  .profile-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 999px;
+    object-fit: cover;
+    border: 1px solid #d8ddf7;
+    box-shadow: 0 0 0 1px rgba(120, 103, 255, 0.12);
   }
 }
 
-/* ─── Main nav bar ─────────────────────────────── */
+/* Main nav bar */
 .mainnav {
   position: sticky;
   top: 36px;
@@ -63,7 +74,6 @@
     align-items: center;
     gap: 8px;
 
-    /* Make NavLink anchors look like buttons */
     > a {
       font: inherit;
       color: #111;
@@ -71,7 +81,7 @@
       border: none;
       padding: 8px 12px;
       cursor: pointer;
-      text-decoration: none;      /* removes blue underline */
+      text-decoration: none;
       transition: color 0.2s;
 
       &:hover {
@@ -79,11 +89,10 @@
       }
 
       &.active {
-        border-bottom: 2px solid #7a3cff; /* underline active page */
+        border-bottom: 2px solid #7a3cff;
       }
     }
 
-    /* Dropdown button styled like a normal nav button */
     .dd-toggle.dropdown-toggle {
       background: transparent;
       color: #111;
@@ -100,7 +109,6 @@
       }
     }
 
-    /* Dropdown menu background & spacing */
     .dd-menu.dropdown-menu {
       min-width: 180px;
       border: 1px solid #eee;

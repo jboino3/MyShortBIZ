@@ -1,14 +1,56 @@
-
+import { useEffect, useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import Dropdown from "react-bootstrap/Dropdown";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Layout.scss";
 import logo from "../assets/logo.png.png";
+import defaultAvatar from "../assets/FixedImage.png";
+import { useAuth } from "../AccountCreationAndPayment/AuthContext";
+import { API_BASE } from "../lib/apiBase";
+
+type PageOut = {
+  avatar_url?: string | null;
+};
 
 export default function Layout() {
+  const { user, token } = useAuth();
+  const [avatarUrl, setAvatarUrl] = useState<string>(defaultAvatar);
+  useEffect(() => {
+    const fetchAvatar = async () => {
+      if (!token || !user) {
+        setAvatarUrl(defaultAvatar);
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/content/me/page`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        });
+
+        if (!res.ok) {
+          setAvatarUrl(defaultAvatar);
+          return;
+        }
+
+        const data = (await res.json()) as PageOut | null;
+        if (data?.avatar_url) {
+          setAvatarUrl(data.avatar_url);
+        } else {
+          setAvatarUrl(defaultAvatar);
+        }
+      } catch {
+        setAvatarUrl(defaultAvatar);
+      }
+    };
+
+    fetchAvatar();
+  }, [API_BASE, token, user]);
+
   return (
     <>
-      {/* Top utility bar */}
       <div className="topbar">
         <div className="topbar__left">
           <button className="linklike">Sign in</button>
@@ -17,10 +59,10 @@ export default function Layout() {
         <div className="topbar__right">
           <button className="linklike">Settings</button>
           <button className="linklike">Help &amp; Contact</button>
+          {user ? <img className="profile-avatar" src={avatarUrl} alt="Profile" /> : null}
         </div>
       </div>
 
-      {/* Main nav bar */}
       <header className="mainnav">
         <div className="mainnav__logo">
           <NavLink to="/" aria-label="MyShort.biz Home">
@@ -29,35 +71,75 @@ export default function Layout() {
         </div>
 
         <nav className="mainnav__menu" aria-label="Primary">
-          <NavLink to="/about" className={({isActive}) => isActive ? "active" : ""}>About us</NavLink>
+          <NavLink to="/about" className={({ isActive }) => (isActive ? "active" : "")}>
+            About us
+          </NavLink>
 
-          <NavLink to="/features" className={({isActive}) => isActive ? "active" : ""}>Features</NavLink>
-          <NavLink to="/solutions" className={({isActive}) => isActive ? "active" : ""}>Solutions</NavLink>
-          <NavLink to="/pricing" className={({isActive}) => isActive ? "active" : ""}>Pricing</NavLink>
-          <NavLink to="/resources" className={({isActive}) => isActive ? "active" : ""}>Resources</NavLink>
-          <NavLink to="/contact" className={({isActive}) => isActive ? "active" : ""}>Contact</NavLink>
+          <NavLink to="/features" className={({ isActive }) => (isActive ? "active" : "")}>
+            Features
+          </NavLink>
+          <NavLink to="/solutions" className={({ isActive }) => (isActive ? "active" : "")}>
+            Solutions
+          </NavLink>
+          <NavLink to="/pricing" className={({ isActive }) => (isActive ? "active" : "")}>
+            Pricing
+          </NavLink>
+          <NavLink to="/resources" className={({ isActive }) => (isActive ? "active" : "")}>
+            Resources
+          </NavLink>
+          <NavLink to="/contact" className={({ isActive }) => (isActive ? "active" : "")}>
+            Contact
+          </NavLink>
 
           <Dropdown align="end">
-            <Dropdown.Toggle id="more-dd" className="dd-toggle">More</Dropdown.Toggle>
+            <Dropdown.Toggle id="more-dd" className="dd-toggle">
+              More
+            </Dropdown.Toggle>
             <Dropdown.Menu className="dd-menu">
-              <Dropdown.Item as={NavLink} to="/creator">Creator Home</Dropdown.Item>
-              <Dropdown.Item as={NavLink} to="/shop">Shop</Dropdown.Item>
-              <Dropdown.Item as={NavLink} to="/store">Store</Dropdown.Item>
-              <Dropdown.Item as={NavLink} to="/studio">Studio</Dropdown.Item>
-              <Dropdown.Item as={NavLink} to="/blog">Blog</Dropdown.Item>
-              <Dropdown.Item as={NavLink} to="/social">Social</Dropdown.Item>
-              <Dropdown.Item as={NavLink} to="/link">Link</Dropdown.Item>
-              <Dropdown.Item as={NavLink} to="/video">Video</Dropdown.Item>
-              <Dropdown.Item as={NavLink} to="/thesis">Thesis</Dropdown.Item>
-              <Dropdown.Item as={NavLink} to="/cv">CV</Dropdown.Item>
-              <Dropdown.Item as={NavLink} to="/bio">Bio</Dropdown.Item>
-              <Dropdown.Item as={NavLink} to="/misc">Misc</Dropdown.Item>
+              <Dropdown.Item as={NavLink} to="/creator">
+                Creator Home
+              </Dropdown.Item>
+              <Dropdown.Item as={NavLink} to="/payment">
+                Payment
+              </Dropdown.Item>
+              <Dropdown.Item as={NavLink} to="/shop">
+                Shop
+              </Dropdown.Item>
+              <Dropdown.Item as={NavLink} to="/store">
+                Store
+              </Dropdown.Item>
+              <Dropdown.Item as={NavLink} to="/studio">
+                Studio
+              </Dropdown.Item>
+              <Dropdown.Item as={NavLink} to="/blog">
+                Blog
+              </Dropdown.Item>
+              <Dropdown.Item as={NavLink} to="/social">
+                Social
+              </Dropdown.Item>
+              <Dropdown.Item as={NavLink} to="/link">
+                Link
+              </Dropdown.Item>
+              <Dropdown.Item as={NavLink} to="/video">
+                Video
+              </Dropdown.Item>
+              <Dropdown.Item as={NavLink} to="/thesis">
+                Thesis
+              </Dropdown.Item>
+              <Dropdown.Item as={NavLink} to="/cv">
+                CV
+              </Dropdown.Item>
+              <Dropdown.Item as={NavLink} to="/bio">
+                Bio
+              </Dropdown.Item>
+              <Dropdown.Item as={NavLink} to="/misc">
+                Misc
+              </Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         </nav>
       </header>
 
-      {/* Routed page content */}
       <Outlet />
     </>
   );

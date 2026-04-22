@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { API_BASE } from '../lib/apiBase'
 import './style.scss'
 
 type VideoGenerateResponse = {
@@ -25,7 +26,6 @@ type VideoJob = {
   error_message?: string | null
 }
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'
 const VIDEO_GENERATE_ENDPOINT = `${API_BASE}/ai/video/generate`
 const VIDEO_MY_ENDPOINT = `${API_BASE}/ai/video/my`
 

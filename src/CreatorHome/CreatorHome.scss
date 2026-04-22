@@ -1,0 +1,115 @@
+@use "../pages/style.scss";
+
+.creator-home-page {
+  padding-top: 5.5rem;
+}
+
+.creator-home-header {
+  &__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  &__logout {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.72rem 1.2rem;
+    border: 1px solid rgba(120, 103, 255, 0.35);
+    border-radius: 999px;
+    background: linear-gradient(180deg, #ffffff 0%, #f3f0ff 100%);
+    color: #3a31c4;
+    box-shadow: 0 8px 18px rgba(26, 31, 65, 0.1);
+    font-size: 0.92rem;
+    font-weight: 700;
+    transition: all 0.2s ease;
+  }
+
+  &__logout:hover {
+    transform: translateY(-2px);
+    background: #f1efff;
+    color: #2e26af;
+    box-shadow: 0 12px 24px rgba(26, 31, 65, 0.16);
+  }
+
+  &__logout:focus-visible {
+    outline: 2px solid rgba(58, 49, 196, 0.4);
+    outline-offset: 3px;
+  }
+
+  .plan-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1rem;
+    padding: 0.75rem 1.4rem;
+    border-radius: 999px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid rgba(120, 103, 255, 0.35);
+    color: #3a31c4;
+    background: #ffffff;
+    box-shadow: 0 8px 18px rgba(26, 31, 65, 0.1);
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(26, 31, 65, 0.16);
+      background: #f1efff;
+      color: #2e26af;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .creator-home-header {
+    &__top {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    &__logout {
+      align-self: flex-end;
+    }
+  }
+}
+
+.creator-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1rem;
+}
+
+.creator-tool-card {
+  display: block;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(120, 103, 255, 0.16);
+  border-radius: 16px;
+  padding: 1rem 1.1rem;
+  box-shadow: 0 8px 24px rgba(26, 31, 65, 0.08);
+  transition: all 0.2s ease;
+
+  h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    color: #171a2d;
+  }
+
+  p {
+    margin: 0.55rem 0 0;
+    font-size: 0.9rem;
+    color: #50556e;
+    line-height: 1.45;
+  }
+
+  &:hover {
+    transform: translateY(-3px);
+    border-color: rgba(120, 103, 255, 0.48);
+    box-shadow: 0 12px 28px rgba(26, 31, 65, 0.14);
+    background: #ffffff;
+  }
+}
