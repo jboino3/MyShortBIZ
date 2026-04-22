@@ -1,5 +1,6 @@
 import { useState } from "react"; 
 import { useNavigate } from "react-router-dom";
+import { API_BASE } from "../lib/apiBase";
 import "./Register.scss";
 import testVid from "../assets/test.mp4"
 import testLink from "../assets/linktest.gif"
@@ -16,8 +17,6 @@ export default function Register() {
   const hasUpper = /[A-Z]/.test(password);
   const hasNumber = /\d/.test(password);
   const hasSpecial = /[!@#$%^&*()_\-+=[\]{};':"\\|,.<>/?~`]/.test(password)
-  const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
@@ -71,7 +70,11 @@ export default function Register() {
       //success, navigated to sign in
       navigate("/signin");
     } catch (err: any) {
-      setError(err?.message || "Registration failed.");
+      const message =
+        err instanceof TypeError
+          ? "Cannot reach the API. Start the dev stack with `npm run dev` and try again."
+          : err?.message || "Registration failed.";
+      setError(message);
     } finally {
       setLoading(false);
     }

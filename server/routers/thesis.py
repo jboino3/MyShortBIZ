@@ -63,6 +63,8 @@ class VoiceProfileState(BaseModel):
     generation_error: Optional[str] = None
     conversation_ready: bool = False
     conversation_cache_ready: bool = False
+    conversation_cache_progress: int = 0
+    conversation_cache_target: int = 0
     conversation_history: List[dict[str, Any]] = Field(default_factory=list)
 
 
@@ -202,7 +204,11 @@ def _serialize(value) -> str:
 
 
 def _best_reference_clip(clips: List[ReferenceClipItem]) -> Optional[ReferenceClipItem]:
-    completed = [item for item in clips if item.completed and item.file_path]
+    completed = [
+        item
+        for item in clips
+        if item.completed and item.file_path and Path(item.file_path).exists()
+    ]
     if not completed:
         return None
 
@@ -557,6 +563,8 @@ def generate_voice_profile(
             "generation_error": None,
             "conversation_ready": False,
             "conversation_cache_ready": False,
+            "conversation_cache_progress": 0,
+            "conversation_cache_target": 0,
             "notes": "Queued the local clone job. Progress will update until the voice is ready.",
         }
     )
@@ -620,6 +628,8 @@ def generate_voice_preview(
             "generation_error": None,
             "conversation_ready": True,
             "conversation_cache_ready": True,
+            "conversation_cache_progress": 1,
+            "conversation_cache_target": 1,
             "notes": "Local preview regenerated from the current reference clip.",
         }
     )

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { useAuth } from "./AuthContext";
+import { API_BASE } from "../lib/apiBase";
 import "./Payment.scss";
 
 type Plan = {
@@ -25,8 +26,6 @@ type CardFormState = {
   expiry: string;
   cvc: string;
 };
-
-const API_BASE = (import.meta as any).env?.VITE_API_BASE || "http://localhost:8000";
 
 export default function Payment() {
   const { token, user } = useAuth();

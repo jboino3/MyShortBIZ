@@ -2,6 +2,7 @@ import json
 import logging
 import os
 from datetime import datetime
+from pathlib import Path
 from threading import Lock
 from typing import Any, Optional
 
@@ -161,7 +162,7 @@ class TelephonySessionService:
     def _best_reference_clip(self, reference_clips: list[dict[str, Any]]) -> Optional[dict[str, Any]]:
         completed = [
             item for item in reference_clips
-            if item.get("completed") and item.get("file_path")
+            if item.get("completed") and item.get("file_path") and Path(item["file_path"]).exists()
         ]
         if not completed:
             return None

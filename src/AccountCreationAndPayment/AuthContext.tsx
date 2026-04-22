@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_BASE } from "../lib/apiBase";
 
 export type UserOut = {
   id: string;
@@ -30,8 +31,6 @@ export const useAuth = (): AuthContextType => {
   if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
   return ctx;
 };
-
-const API_BASE = (import.meta as any).env?.VITE_API_BASE || "http://localhost:8000";
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();

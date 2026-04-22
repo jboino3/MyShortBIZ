@@ -6,6 +6,7 @@ import "./style.scss";
 import logo from "../assets/logo.png.png";
 import defaultAvatar from "../assets/FixedImage.png";
 import { useAuth } from "../AccountCreationAndPayment/AuthContext";
+import { API_BASE } from "../lib/apiBase";
 
 type PageOut = {
   avatar_url?: string | null;
@@ -14,8 +15,6 @@ type PageOut = {
 export default function Layout() {
   const { user, token } = useAuth();
   const [avatarUrl, setAvatarUrl] = useState<string>(defaultAvatar);
-  const API_BASE = (import.meta as any).env?.VITE_API_BASE || "http://localhost:8000";
-
   useEffect(() => {
     const fetchAvatar = async () => {
       if (!token || !user) {

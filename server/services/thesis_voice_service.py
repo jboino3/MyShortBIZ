@@ -5,6 +5,7 @@ import io
 import json
 import os
 import re
+import shutil
 import time
 import unicodedata
 from pathlib import Path
@@ -19,10 +20,26 @@ import torchaudio
 class ThesisVoiceService:
     def __init__(self):
         self.repo_root = Path(__file__).resolve().parents[2]
-        self.cache_root = self.repo_root / "server" / ".cache"
-        self.hf_home = self.cache_root / "huggingface"
-        self.xdg_home = self.cache_root / "xdg"
+        self.legacy_repo_cache_root = self.repo_root / "server" / ".cache"
+        configured_uploads_root = os.getenv("THESIS_UPLOAD_ROOT")
+        default_uploads_root = self.repo_root / "server" / "uploads" / "thesis"
+        self.reference_uploads_root = Path(configured_uploads_root).expanduser() if configured_uploads_root else default_uploads_root
+        if not self.reference_uploads_root.is_absolute():
+            self.reference_uploads_root = self.repo_root / self.reference_uploads_root
+        default_cache_root = Path(os.getenv("TMPDIR", "/tmp")) / "myshortbiz-cache"
+        configured_cache_root = os.getenv("THESIS_MODEL_CACHE_ROOT")
+        self.cache_root = Path(configured_cache_root).expanduser() if configured_cache_root else default_cache_root
+        configured_hf_home = os.getenv("HF_HOME")
+        configured_xdg_home = os.getenv("XDG_CACHE_HOME")
+        self.hf_home = Path(configured_hf_home).expanduser() if configured_hf_home else self.cache_root / "huggingface"
+        self.xdg_home = Path(configured_xdg_home).expanduser() if configured_xdg_home else self.cache_root / "xdg"
         self.outputs_root = self.repo_root / "server" / "generated_audio"
+        configured_prompt_root = os.getenv("THESIS_REFERENCE_PROMPT_ROOT")
+        self.reference_prompt_root = (
+            Path(configured_prompt_root).expanduser()
+            if configured_prompt_root
+            else self.repo_root / "server" / "reference_prompts"
+        )
         self.daemon_url = os.getenv("THESIS_VOICE_DAEMON_URL", "http://127.0.0.1:8011")
         self.daemon_mode = os.getenv("THESIS_VOICE_DAEMON_MODE", "false").lower() in {"1", "true", "yes", "on"}
         self.model_variant = os.getenv("THESIS_VOICE_MODEL", "turbo").strip().lower()
@@ -30,17 +47,23 @@ class ThesisVoiceService:
         self.max_cached_wavs_per_user_variant = max(1, int(os.getenv("THESIS_AUDIO_CACHE_MAX_WAVS", "40")))
         self.max_cached_pcms_per_user_variant = max(1, int(os.getenv("THESIS_AUDIO_CACHE_MAX_PCMS", "80")))
         self.cache_max_age_seconds = max(0, int(os.getenv("THESIS_AUDIO_CACHE_MAX_AGE_SECONDS", str(14 * 24 * 60 * 60))))
+        self.reference_upload_ttl_seconds = max(0, int(os.getenv("THESIS_REFERENCE_UPLOAD_TTL_SECONDS", "3600")))
+        self.clear_generated_audio_on_startup = os.getenv("THESIS_CLEAR_GENERATED_AUDIO_ON_STARTUP", "true").lower() in {"1", "true", "yes", "on"}
+        self.clear_legacy_model_cache_on_startup = os.getenv("THESIS_CLEAR_LEGACY_MODEL_CACHE_ON_STARTUP", "true").lower() in {"1", "true", "yes", "on"}
         self._models: dict[str, object] = {}
         self._preview_cache: dict[str, dict] = {}
         self._pcm_cache: dict[str, bytes] = {}
         self._lock = Lock()
+        self._startup_maintenance_done = False
 
         self.hf_home.mkdir(parents=True, exist_ok=True)
         self.xdg_home.mkdir(parents=True, exist_ok=True)
         self.outputs_root.mkdir(parents=True, exist_ok=True)
+        self.reference_uploads_root.mkdir(parents=True, exist_ok=True)
+        self.reference_prompt_root.mkdir(parents=True, exist_ok=True)
 
-        os.environ.setdefault("HF_HOME", str(self.hf_home))
-        os.environ.setdefault("XDG_CACHE_HOME", str(self.xdg_home))
+        os.environ["HF_HOME"] = str(self.hf_home)
+        os.environ["XDG_CACHE_HOME"] = str(self.xdg_home)
 
     def _normalize_variant(self, variant: str | None) -> str:
         value = (variant or self.model_variant).strip().lower()
@@ -69,6 +92,52 @@ class ThesisVoiceService:
 
     def preload_variants(self):
         self._load_model(self.conversation_model_variant)
+
+    def _clear_memory_caches(self):
+        self._preview_cache.clear()
+        self._pcm_cache.clear()
+
+    def clear_generated_audio_outputs(self):
+        self._clear_memory_caches()
+        if not self.outputs_root.exists():
+            return
+
+        for path in self.outputs_root.iterdir():
+            if path.is_file():
+                try:
+                    path.unlink()
+                except FileNotFoundError:
+                    pass
+            elif path.is_dir():
+                shutil.rmtree(path, ignore_errors=True)
+
+    def _purge_legacy_repo_model_cache(self):
+        protected = {self.hf_home.resolve(), self.xdg_home.resolve()}
+        for legacy_path in (
+            self.legacy_repo_cache_root / "huggingface",
+            self.legacy_repo_cache_root / "xdg",
+        ):
+            if not legacy_path.exists():
+                continue
+            try:
+                resolved = legacy_path.resolve()
+            except FileNotFoundError:
+                continue
+            if resolved in protected:
+                continue
+            shutil.rmtree(legacy_path, ignore_errors=True)
+
+    def startup_maintenance(self):
+        with self._lock:
+            if self._startup_maintenance_done:
+                return
+            if self.clear_generated_audio_on_startup:
+                self.clear_generated_audio_outputs()
+            else:
+                self._clear_memory_caches()
+            if self.clear_legacy_model_cache_on_startup:
+                self._purge_legacy_repo_model_cache()
+            self._startup_maintenance_done = True
 
     def _run_quietly(self, func, *args, **kwargs):
         sink = io.StringIO()
@@ -135,6 +204,56 @@ class ThesisVoiceService:
     def _touch(self, path: Path):
         now = time.time()
         os.utime(path, (now, now))
+
+    def _is_within_root(self, path: Path, root: Path) -> bool:
+        try:
+            path.resolve(strict=False).relative_to(root.resolve(strict=False))
+            return True
+        except ValueError:
+            return False
+
+    def is_reference_upload_path(self, path: str | None) -> bool:
+        if not path:
+            return False
+        return self._is_within_root(Path(path), self.reference_uploads_root)
+
+    def preserve_reference_prompt(self, user_id: str, source_path: str) -> str:
+        source = Path(source_path)
+        if not source.exists():
+            raise FileNotFoundError(source_path)
+
+        safe_user_id = user_id.replace("/", "_")
+        target = self.reference_prompt_root / f"{safe_user_id}.wav"
+        if source.resolve(strict=False) != target.resolve(strict=False):
+            shutil.copy2(source, target)
+        self._touch(target)
+        return str(target)
+
+    def clear_reference_uploads_for_user(self, user_id: str):
+        upload_dir = self.reference_uploads_root / user_id
+        if upload_dir.exists():
+            shutil.rmtree(upload_dir, ignore_errors=True)
+
+    def prune_reference_uploads(self, max_age_seconds: int | None = None):
+        if not self.reference_uploads_root.exists():
+            return
+
+        ttl_seconds = self.reference_upload_ttl_seconds if max_age_seconds is None else max(0, max_age_seconds)
+        cutoff = time.time() - ttl_seconds
+        for path in sorted(self.reference_uploads_root.rglob("*"), reverse=True):
+            if path.is_file():
+                try:
+                    if ttl_seconds == 0 or path.stat().st_mtime < cutoff:
+                        path.unlink()
+                except FileNotFoundError:
+                    pass
+            elif path.is_dir():
+                try:
+                    next(path.iterdir())
+                except StopIteration:
+                    path.rmdir()
+                except FileNotFoundError:
+                    pass
 
     def _prune_cache_files(self, *, safe_user_id: str, variant: str, suffix: str, keep: int):
         prefix = f"{safe_user_id}-{variant}-"

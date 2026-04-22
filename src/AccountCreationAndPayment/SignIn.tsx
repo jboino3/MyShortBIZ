@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
+import { API_BASE } from "../lib/apiBase";
 import "./SignIn.scss";
 
 type TokenResponse = {
@@ -23,7 +24,6 @@ export default function SignIn() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
   const redirectPath =
     (location.state as { from?: { pathname?: string } } | null)?.from?.pathname || "/creator";
 
@@ -82,7 +82,11 @@ export default function SignIn() {
 
       navigate(redirectPath, { replace: true });
     } catch (err: any) {
-      setError(err?.message || "Login failed.");
+      const message =
+        err instanceof TypeError
+          ? "Cannot reach the API. Start the dev stack with `npm run dev` and try again."
+          : err?.message || "Login failed.";
+      setError(message);
     } finally {
       setLoading(false);
     }

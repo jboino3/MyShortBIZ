@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../AccountCreationAndPayment/AuthContext";
+import { API_BASE } from "../lib/apiBase";
 import "./CreatorHome.scss";
 
 type ToolLink = {
@@ -35,8 +36,6 @@ function CreatorHome() {
   const { user, token, logout } = useAuth();
   const [currentPlan, setCurrentPlan] = useState("Starter");
   const displayName = user?.full_name || user?.email || "Creator";
-  const API_BASE = (import.meta as any).env?.VITE_API_BASE || "http://localhost:8000";
-
   useEffect(() => {
     const loadPlan = async () => {
       if (!token) {

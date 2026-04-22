@@ -1,6 +1,7 @@
 // src/CreatorHome/Blog.tsx
 import "./Blog.scss";
 import { useState } from 'react';
+import { API_BASE } from "../lib/apiBase";
 
 export default function Blog() {
 
@@ -52,7 +53,7 @@ export default function Blog() {
   };
 
   try {
-    const response = await fetch("http://localhost:8000/api/blog/generate", {
+    const response = await fetch(`${API_BASE}/api/blog/generate`, {
       method: "POST",
       headers: { 
         "Content-Type": "application/json",
@@ -95,7 +96,7 @@ export default function Blog() {
   };
 
   try {
-    const response = await fetch("http://localhost:8000/api/blog/generate", {
+    const response = await fetch(`${API_BASE}/api/blog/generate`, {
       method: "POST",
       headers: { 
         "Content-Type": "application/json",

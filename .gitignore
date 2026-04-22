@@ -34,5 +34,7 @@ call_recordings/
 testing_audio/
 server/.cache/
 server/generated_audio/
+server/reference_prompts/
+server/uploads/thesis/
 *.db
 *:Zone.Identifier

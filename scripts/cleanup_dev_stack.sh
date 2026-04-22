@@ -11,3 +11,8 @@ pkill -f 'uvicorn main:app --reload --port 8000' 2>/dev/null || true
 pkill -f 'uvicorn voice_daemon:app --port 8011' 2>/dev/null || true
 pkill -f 'bash scripts/start_ngrok_tunnel.sh' 2>/dev/null || true
 pkill -f 'bash scripts/ensure_telephony_ready.sh' 2>/dev/null || true
+
+# Clear generated voice clips and legacy repo-local model caches before a fresh start.
+find /home/anya/MyShortBIZ/server/generated_audio -mindepth 1 -delete 2>/dev/null || true
+rm -rf /home/anya/MyShortBIZ/server/.cache/huggingface 2>/dev/null || true
+rm -rf /home/anya/MyShortBIZ/server/.cache/xdg 2>/dev/null || true

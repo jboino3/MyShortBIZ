@@ -407,17 +407,6 @@ class ThesisAgentService:
             phone_config=phone_config,
             business_name=business_name,
         )
-        for history, prompt in self.phone_warmup_turns():
-            phone_replies.append(
-                self.build_phone_reply(
-                    agent_config=agent_config,
-                    phone_config=phone_config,
-                    business_name=business_name,
-                    history=history,
-                    user_message=prompt,
-                    max_chars=150,
-                )
-            )
 
         ordered = [
             *phone_replies,
@@ -426,8 +415,6 @@ class ThesisAgentService:
             knowledge["disclosure"],
             knowledge["smalltalk"],
             "Let me think.",
-            "That is outside the saved business description. I can still help with simple conversational questions, but I am most reliable on the business, pricing, features, and callback workflow.",
-            "Thanks. I have your name as Alex Carter.",
         ]
         return list(dict.fromkeys(item for item in ordered if item))
 

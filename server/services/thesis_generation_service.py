@@ -4,6 +4,7 @@ import json
 import threading
 import time
 from datetime import datetime
+from pathlib import Path
 
 from db import SessionLocal
 from models import ThesisProject
@@ -28,6 +29,27 @@ class ThesisGenerationService:
     def _serialize(self, value) -> str:
         return json.dumps(value, default=str)
 
+    def _existing_completed_clips(self, reference_clips: list[dict]) -> list[dict]:
+        return [
+            item
+            for item in reference_clips
+            if item.get("completed") and item.get("file_path") and Path(item["file_path"]).exists()
+        ]
+
+    def _best_existing_clip(self, reference_clips: list[dict]) -> dict | None:
+        completed = self._existing_completed_clips(reference_clips)
+        if not completed:
+            return None
+        return sorted(
+            completed,
+            key=lambda item: (
+                float(item.get("duration_seconds") or 0.0),
+                item.get("recorded_at") or "",
+                item.get("clip_id") or "",
+            ),
+            reverse=True,
+        )[0]
+
     def _update_voice_profile(self, project_id: int, updater):
         db = SessionLocal()
         try:
@@ -42,6 +64,82 @@ class ThesisGenerationService:
         finally:
             db.close()
 
+    def _promote_reference_prompt(self, *, project_id: int, user_id: str, source_prompt_path: str) -> str:
+        preserved_prompt_path = thesis_voice_service.preserve_reference_prompt(user_id, source_prompt_path)
+        db = SessionLocal()
+        try:
+            project = db.query(ThesisProject).filter(ThesisProject.id == project_id).first()
+            if not project:
+                return preserved_prompt_path
+
+            reference_clips = self._parse_json(project.phrase_progress_json, [])
+            updated = False
+            for item in reference_clips:
+                if item.get("file_path") == source_prompt_path:
+                    item["file_path"] = preserved_prompt_path
+                    item["clip_label"] = Path(preserved_prompt_path).name
+                    updated = True
+                    break
+
+            if not updated:
+                best_clip = self._best_existing_clip(reference_clips)
+                if best_clip:
+                    best_clip["file_path"] = preserved_prompt_path
+                    best_clip["clip_label"] = Path(preserved_prompt_path).name
+                    updated = True
+
+            if updated:
+                project.phrase_progress_json = self._serialize(reference_clips)
+                db.add(project)
+                db.commit()
+        finally:
+            db.close()
+
+        if thesis_voice_service.is_reference_upload_path(source_prompt_path):
+            thesis_voice_service.clear_reference_uploads_for_user(user_id)
+        return preserved_prompt_path
+
+    def migrate_reference_prompts_and_cleanup_uploads(self):
+        db = SessionLocal()
+        try:
+            projects = db.query(ThesisProject).all()
+            for project in projects:
+                voice_profile = self._parse_json(project.voice_profile_json, {})
+                if not (
+                    voice_profile.get("preview_available")
+                    or voice_profile.get("status") in {"ready", "ready_for_agent"}
+                ):
+                    continue
+
+                reference_clips = self._parse_json(project.phrase_progress_json, [])
+                best_clip = self._best_existing_clip(reference_clips)
+                if not best_clip:
+                    continue
+
+                preserved_prompt_path = thesis_voice_service.preserve_reference_prompt(
+                    project.user_id,
+                    best_clip["file_path"],
+                )
+
+                if best_clip.get("file_path") != preserved_prompt_path:
+                    for item in reference_clips:
+                        if (
+                            item.get("clip_id") == best_clip.get("clip_id")
+                            and item.get("file_path") == best_clip.get("file_path")
+                        ):
+                            item["file_path"] = preserved_prompt_path
+                            item["clip_label"] = Path(preserved_prompt_path).name
+                            project.phrase_progress_json = self._serialize(reference_clips)
+                            db.add(project)
+                            db.commit()
+                            break
+
+                thesis_voice_service.clear_reference_uploads_for_user(project.user_id)
+        finally:
+            db.close()
+
+        thesis_voice_service.prune_reference_uploads()
+
     def _set_progress(self, project_id: int, *, status: str, progress: int, notes: str, attached_to_agent: bool | None = None):
         def updater(voice_profile: dict):
             voice_profile["status"] = status
@@ -52,6 +150,8 @@ class ThesisGenerationService:
             voice_profile.setdefault("preview_available", False)
             voice_profile.setdefault("recorded_clips", 0)
             voice_profile.setdefault("conversation_cache_ready", False)
+            voice_profile.setdefault("conversation_cache_progress", 0)
+            voice_profile.setdefault("conversation_cache_target", 0)
             if attached_to_agent is not None:
                 voice_profile["attached_to_agent"] = attached_to_agent
             return voice_profile
@@ -272,6 +372,8 @@ class ThesisGenerationService:
                     "generation_target": 1000,
                     "conversation_ready": False,
                     "conversation_cache_ready": False,
+                    "conversation_cache_progress": 0,
+                    "conversation_cache_target": 0,
                     "notes": f"Local voice generation failed: {error_holder['error']}",
                     "generation_error": error_holder["error"],
                 },
@@ -279,6 +381,11 @@ class ThesisGenerationService:
             return
 
         preview = result_holder["preview"]
+        self._promote_reference_prompt(
+            project_id=project_id,
+            user_id=user_id,
+            source_prompt_path=prompt_path,
+        )
 
         def finalize(voice_profile: dict):
             history = voice_profile.get("conversation_history") or []
@@ -296,6 +403,8 @@ class ThesisGenerationService:
                 "generation_error": None,
                 "conversation_ready": True,
                 "conversation_cache_ready": False,
+                "conversation_cache_progress": 0,
+                "conversation_cache_target": 0,
                 "conversation_history": history,
                 "notes": (
                     f"Local zero-shot voice clone generated from the uploaded reference audio."
@@ -316,43 +425,45 @@ class ThesisGenerationService:
             agent_config = self._parse_json(project.agent_config_json, {})
             phone_config = self._parse_json(project.phone_config_json, {})
             reference_clips = self._parse_json(project.phrase_progress_json, [])
-            completed = [item for item in reference_clips if item.get("completed") and item.get("file_path")]
-            if not completed:
+            best_clip = self._best_existing_clip(reference_clips)
+            if not best_clip:
                 return
-            best_clip = sorted(
-                completed,
-                key=lambda item: (
-                    float(item.get("duration_seconds") or 0.0),
-                    item.get("recorded_at") or "",
-                    item.get("clip_id") or "",
-                ),
-                reverse=True,
-            )[0]
             reply_texts = thesis_agent_service.warmup_replies(
                 agent_config=agent_config,
                 phone_config=phone_config,
                 business_name=agent_config.get("business_name", "MyShortBIZ"),
             )
-            for prompt in thesis_agent_service.warmup_prompts():
-                reply_texts.append(
-                    thesis_agent_service.build_reply(
-                        agent_config=agent_config,
-                        phone_config=phone_config,
-                        business_name=agent_config.get("business_name", "MyShortBIZ"),
-                        history=[],
-                        user_message=prompt,
-                    )
-                )
+            unique_replies = list(dict.fromkeys(reply_texts))
+            total_replies = max(len(unique_replies), 1)
+            voice_profile = self._parse_json(project.voice_profile_json, {})
+            voice_profile["conversation_cache_ready"] = False
+            voice_profile["conversation_cache_progress"] = 0
+            voice_profile["conversation_cache_target"] = total_replies
+            voice_profile["notes"] = "Warming common replies for faster live responses."
+            project.voice_profile_json = self._serialize(voice_profile)
+            db.add(project)
+            db.commit()
 
-            for reply in dict.fromkeys(reply_texts):
+            completed_replies = 0
+            for reply in unique_replies:
                 thesis_voice_service.generate_preview(
                     project.user_id,
                     best_clip["file_path"],
                     reply,
                     variant=thesis_voice_service.conversation_model_variant,
                 )
+                completed_replies += 1
+                voice_profile = self._parse_json(project.voice_profile_json, {})
+                voice_profile["conversation_cache_progress"] = completed_replies
+                voice_profile["conversation_cache_target"] = total_replies
+                project.voice_profile_json = self._serialize(voice_profile)
+                db.add(project)
+                db.commit()
             voice_profile = self._parse_json(project.voice_profile_json, {})
             voice_profile["conversation_cache_ready"] = True
+            voice_profile["conversation_cache_progress"] = total_replies
+            voice_profile["conversation_cache_target"] = total_replies
+            voice_profile["notes"] = "Common replies are warmed and ready for faster live responses."
             project.voice_profile_json = self._serialize(voice_profile)
             db.add(project)
             db.commit()

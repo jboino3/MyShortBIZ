@@ -1,6 +1,8 @@
+import os
 from importlib import import_module
 from pathlib import Path
 from threading import Thread
+from time import sleep
 
 from dotenv import load_dotenv
 from fastapi import FastAPI
@@ -22,6 +24,7 @@ import models  # noqa: F401
 from services.phone_speech_service import normalize_phone_tts_text
 from services.telephony_session_service import telephony_session_service
 from services.thesis_agent_service import thesis_agent_service
+from services.thesis_generation_service import thesis_generation_service
 from services.thesis_voice_service import thesis_voice_service
 
 OPTIONAL_ROUTER_MODULES = [
@@ -34,6 +37,11 @@ OPTIONAL_ROUTER_MODULES = [
     "routers.ai_video",
     "routers.video_prompt_builder",
 ]
+STARTUP_PHONE_WARMUP_LIMIT = max(0, int(os.getenv("THESIS_STARTUP_PHONE_WARMUP_LIMIT", "4")))
+REFERENCE_UPLOAD_CLEANUP_INTERVAL_SECONDS = max(
+    60,
+    int(os.getenv("THESIS_REFERENCE_UPLOAD_CLEANUP_INTERVAL_SECONDS", "3600")),
+)
 
 app = FastAPI(
     title="MyShortBIZ API",
@@ -67,6 +75,8 @@ def _include_optional_router(module_path: str) -> None:
 
 
 def _prewarm_exact_demo_voice():
+    if STARTUP_PHONE_WARMUP_LIMIT == 0:
+        return
     db = SessionLocal()
     try:
         context = telephony_session_service.build_call_context(db)
@@ -81,7 +91,7 @@ def _prewarm_exact_demo_voice():
                 agent_config=agent_config,
                 phone_config=phone_config,
                 business_name=business_name,
-                prompts=thesis_agent_service.critical_demo_phone_prompts(),
+                prompts=thesis_agent_service.critical_demo_phone_prompts()[:STARTUP_PHONE_WARMUP_LIMIT],
             )
             if greeting:
                 warm_texts = list(dict.fromkeys([greeting, *warm_texts]))
@@ -100,8 +110,17 @@ def _prewarm_exact_demo_voice():
         db.close()
 
 
+def _reference_upload_maintenance_loop():
+    while True:
+        sleep(REFERENCE_UPLOAD_CLEANUP_INTERVAL_SECONDS)
+        thesis_voice_service.prune_reference_uploads()
+
+
 @app.on_event("startup")
 def startup_event():
+    thesis_voice_service.startup_maintenance()
+    thesis_generation_service.migrate_reference_prompts_and_cleanup_uploads()
+    Thread(target=_reference_upload_maintenance_loop, daemon=True).start()
     Thread(target=_prewarm_exact_demo_voice, daemon=True).start()
 
 

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import "./style.scss";
 import { useAuth } from "../AccountCreationAndPayment/AuthContext";
+import { API_BASE } from "../lib/apiBase";
 import { REFERENCE_CLIPS, TEST_SCENARIOS, THESIS_STEPS } from "./thesisDemoData";
 
 type ReferenceClipItem = {
@@ -38,6 +39,8 @@ type VoiceProfileState = {
   generation_error?: string | null;
   conversation_ready: boolean;
   conversation_cache_ready: boolean;
+  conversation_cache_progress: number;
+  conversation_cache_target: number;
   conversation_history: ConversationTurn[];
 };
 
@@ -160,7 +163,6 @@ type ThesisProject = {
 
 type SelectedFiles = Record<string, File | null>;
 
-const API_BASE = (import.meta as any).env?.VITE_API_BASE || "http://localhost:8000";
 type ConsentCheckboxField =
   | "confirmed_owner"
   | "consent_to_clone"
@@ -284,6 +286,16 @@ export default function Thesis() {
     assistantSpeaking ? "is-speaking" : listening ? "is-listening" : liveModeEnabled ? "is-ready" : ""
   }`;
   const conversationFastReady = !!project?.voice_profile.conversation_cache_ready;
+  const conversationCacheTarget = project?.voice_profile.conversation_cache_target || 0;
+  const conversationCacheProgress = Math.min(
+    project?.voice_profile.conversation_cache_progress || 0,
+    conversationCacheTarget
+  );
+  const conversationCachePercent = conversationFastReady
+    ? 100
+    : conversationCacheTarget > 0
+      ? Math.round((conversationCacheProgress / conversationCacheTarget) * 100)
+      : 0;
 
   useEffect(() => {
     const loadProject = async () => {
@@ -1450,8 +1462,8 @@ export default function Thesis() {
                   <h3>Stage 3 voice readiness</h3>
                   <div className="thesis-progress">
                     <div className="thesis-progress__label">
-                      <strong>{generationProgress} / {generationTarget}</strong>
-                      <span>{generationProgressPercent}% complete</span>
+                      <strong>{generationProgressPercent}%</strong>
+                      <span>Clone build progress</span>
                     </div>
                     <div className="thesis-progress__track">
                       <span style={{ width: `${generationProgressPercent}%` }} />
@@ -1818,7 +1830,11 @@ export default function Thesis() {
                   </div>
                   <div className="thesis-progress">
                     <div className="thesis-progress__label">
-                      <strong>{chatBusy || audioRendering ? `${responseProgress}%` : "Idle"}</strong>
+                      <strong>
+                        {chatBusy || audioRendering
+                          ? `${responseProgress}%`
+                          : `${conversationFastReady ? 100 : conversationCachePercent}%`}
+                      </strong>
                       <span>
                         {chatBusy
                           ? "Response generation in progress"
@@ -1828,11 +1844,11 @@ export default function Thesis() {
                             ? `Last reply: ${(responseTimeMs / 1000).toFixed(2)}s`
                             : conversationFastReady
                               ? "Ready for the next turn"
-                              : "Warming common replies"}
+                              : `Warming common replies (${conversationCacheProgress}/${conversationCacheTarget || "?"})`}
                       </span>
                     </div>
                     <div className="thesis-progress__track">
-                      <span style={{ width: `${chatBusy || audioRendering ? responseProgress : conversationFastReady ? 100 : 72}%` }} />
+                      <span style={{ width: `${chatBusy || audioRendering ? responseProgress : conversationFastReady ? 100 : conversationCachePercent}%` }} />
                     </div>
                   </div>
                   <div className="thesis-form-actions">

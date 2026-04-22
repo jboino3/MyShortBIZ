@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { API_BASE } from '../lib/apiBase'
 import './style.scss'
 
 type BioResponse = {
@@ -7,7 +8,6 @@ type BioResponse = {
   tokens_remaining: number
 }
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'
 const BIO_ENDPOINT = `${API_BASE}/ai/bio/generate`
 
 function Bio() {

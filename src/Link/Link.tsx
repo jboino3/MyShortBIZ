@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { API_BASE } from '../lib/apiBase'
 import './style.scss'
 
 type LinkResponse = {
@@ -28,8 +29,6 @@ type AnalyticsSummary = {
   total_clicks: number
   links: MyLink[]
 }
-
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'
 
 const LINK_GENERATE_ENDPOINT = `${API_BASE}/ai/link/generate`
 const MY_LINKS_ENDPOINT = `${API_BASE}/ai/link/my`
