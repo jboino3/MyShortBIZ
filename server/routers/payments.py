@@ -7,10 +7,10 @@ from pydantic import BaseModel, EmailStr, HttpUrl
 from sqlalchemy.orm import Session
 
 from db import get_db
-from models import Plan, Subscription, PaymentEvent
+from models import PaymentEvent, Plan, Subscription, User
 from services.btcpay_service import btcpay_service
 from services.stripe_service import stripe_service
-from .auth import get_current_user, UserOut
+from .auth import UserOut, get_current_user
 
 router = APIRouter(prefix="/payments", tags=["payments"])
 
@@ -135,15 +135,22 @@ def _log_payment_event(db: Session, subscription_id: int, event_type: str, paylo
     db.commit()
 
 
+def _grant_plan_tokens(plan: Plan, user: User) -> None:
+    slug = (plan.slug or "").lower()
+    if slug in {"starter", "starter-10"}:
+        user.tokens_remaining += 10000
+    elif slug in {"pro", "growth", "growth-30"}:
+        user.tokens_remaining += 50000
+    elif slug in {"business", "scale", "scale-100"}:
+        user.tokens_remaining += 200000
+
+
 @router.post("/checkout", response_model=CheckoutResponse)
 def checkout(
     payload: CheckoutRequest,
     current_user: UserOut = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """
-    Legacy checkout endpoint preserved as-is for backward compatibility.
-    """
     plan = _get_plan_or_404(db, payload.plan_slug)
 
     fake_invoice_id = f"INV-{current_user.id[:8]}-{plan.slug}-{int(datetime.utcnow().timestamp())}"
@@ -251,6 +258,11 @@ def webhook_stub(
 
     if payload.event_type == "invoice_paid":
         sub.status = "active"
+        user = db.query(User).filter(User.id == sub.user_id).first()
+        plan = db.query(Plan).filter(Plan.id == sub.plan_id).first()
+        if user and plan:
+            _grant_plan_tokens(plan, user)
+            db.add(user)
     elif payload.event_type == "subscription_canceled":
         sub.status = "canceled"
 

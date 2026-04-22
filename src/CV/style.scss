@@ -1,0 +1,504 @@
+/* CVPage.tsx Styling */
+.cv-page {
+  display: flex;
+  flex-direction: column;  // stack header + content
+  min-height: 100vh;       // fill the viewport
+  background-color: #f7f7f7; // set overall background for page
+
+  &__content {
+      flex: 1;
+      padding: 2rem;
+      background-color: #f7f7f7;  // light background
+      min-height: 100vh;          // ensure it fills the viewport
+      overflow-y: auto;
+  }
+
+  &__header {
+    margin-bottom: 2rem;
+  }
+
+  &__title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+
+  &__description {
+    font-size: 1rem;
+    color: #555;
+    max-width: 800px;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+}
+
+.cv-section {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 10px;
+  margin-top: 2rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+
+  &__title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+
+  &__description {
+    color: #666;
+    margin-bottom: 1rem;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+}
+
+.cv-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  width: auto;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &--primary {
+    background-color: #a741cf;
+    color: white;
+    border: none;
+
+    &:hover {
+      background-color: #9333ea;
+    }
+  }
+
+  &--secondary {
+    background-color: #fff;
+    color: #1f2937;
+    border: 2px solid #1f2937;
+
+    &:hover {
+      background-color: #1f2937;
+      color: white;
+    }
+  }
+}
+
+/* CVBuilder.tsx Styling */
+/* Row layout for inline fields */
+.cv-row {
+  display: flex;
+  gap: 0.75rem;
+
+  input {
+    flex: 1;
+  }
+}
+.cv-builder {
+  flex: 1;                     // allow it to stretch inside content
+  max-width: 700px;            // narrower = more resume-like
+  margin: 0 auto;              // center horizontally
+  padding: 2rem 1rem;          // spacing inside
+  background-color: #ffffff;   // match parent background
+  display: flex;
+  flex-direction: column;       // stack sections vertically
+  border-radius: 10px;
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  &__section {
+    margin-bottom: 2.5rem;
+
+    h2 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #111827;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 0.3rem;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 0.65rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      margin-bottom: 0.75rem;
+      font-size: 0.95rem;
+      transition: border 0.2s ease, box-shadow 0.2s ease;
+
+      &:focus {
+        outline: none;
+        border-color: #a741cf;
+        box-shadow: 0 0 0 2px rgba(167, 65, 207, 0.15);
+      }
+    }
+
+    textarea {
+      min-height: 70px;
+      resize: vertical;
+    }
+  }
+
+  &__entry {
+    margin-bottom: 1rem;
+    padding-left: 0.5rem;
+    border-left: 3px solid #e5e7eb;
+
+    &:hover {
+      border-left-color: #a741cf;
+    }
+  }
+
+  &__skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+
+    span {
+      background: #f3f4f6;
+      padding: 0.4rem 0.7rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: #a741cf;
+        color: white;
+      }
+    }
+  }
+
+  &__generate-btn {
+    width: 100%;
+    margin-top: 2rem;
+    padding: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    background-color: #a741cf;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: #111827;
+    }
+  }
+}
+
+/* CVPortfolio.tsx Styling */
+.cv-portfolio {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 1rem;
+
+  &__top {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+
+    & img.cv-portfolio__pic {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    & .cv-portfolio__intro {
+      h1 {
+        font-size: 1.8rem;
+        margin-bottom: 0.3rem;
+      }
+      p {
+        margin: 0.15rem 0;
+        color: #555;
+      }
+    }
+  }
+
+  &__section {
+    background: #fff;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+
+    h2 {
+      font-size: 1.2rem;
+      margin-bottom: 0.8rem;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 0.3rem;
+    }
+  }
+
+  &__entry {
+    margin-bottom: 0.8rem;
+    p {
+      margin: 0.15rem 0;
+    }
+  }
+
+  &__skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+
+    span {
+      background: #e5e7eb;
+      padding: 0.4rem 0.7rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+  }
+
+}
+.creator-page {
+  padding: 2rem;
+  color: #1a1a1a;
+}
+
+.creator-page__header {
+  margin-bottom: 2rem;
+
+  h1 {
+    margin: 0 0 0.5rem;
+    font-size: 2rem;
+    font-weight: 700;
+  }
+
+  p {
+    margin: 0;
+    color: #666;
+  }
+}
+
+.creator-page__grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.creator-form,
+.creator-output {
+  background: #ffffff;
+  border: 1px solid #e7e7e7;
+  border-radius: 18px;
+  padding: 1.25rem;
+}
+
+.creator-section {
+  margin-bottom: 1.5rem;
+
+  h2 {
+    margin: 0 0 1rem;
+    font-size: 1.1rem;
+  }
+}
+
+.creator-card {
+  border: 1px solid #ececec;
+  border-radius: 14px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: #fafafa;
+}
+
+.creator-field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+
+  label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.45rem;
+  }
+
+  small {
+    margin-top: 0.35rem;
+    color: #777;
+    font-size: 0.85rem;
+  }
+
+  input,
+  textarea {
+    width: 100%;
+    border: 1px solid #d8d8d8;
+    border-radius: 12px;
+    padding: 0.85rem 1rem;
+    font-size: 0.95rem;
+    outline: none;
+    background: #fff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    &:focus {
+      border-color: #7c5cff;
+      box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.12);
+    }
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 110px;
+  }
+}
+
+.creator-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.section-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.primary-btn,
+.secondary-btn,
+.danger-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.primary-btn {
+  width: 100%;
+  background: #7c5cff;
+  color: white;
+
+  &:hover {
+    opacity: 0.92;
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
+
+.secondary-btn {
+  background: #f1edff;
+  color: #7c5cff;
+}
+
+.danger-btn {
+  background: #ffe8e8;
+  color: #c0392b;
+}
+
+.creator-error {
+  margin-top: 1rem;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  background: #fff1f1;
+  color: #c0392b;
+  border: 1px solid #ffd4d4;
+}
+
+.creator-output {
+  position: sticky;
+  top: 1.5rem;
+
+  h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+  }
+}
+
+.creator-placeholder {
+  min-height: 220px;
+  border: 1px dashed #d6d6d6;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #777;
+  background: #fafafa;
+  padding: 1rem;
+  text-align: center;
+}
+
+.creator-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+
+  span {
+    background: #f4f4f4;
+    border-radius: 999px;
+    padding: 0.5rem 0.85rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+}
+
+.creator-markdown {
+  border: 1px solid #ececec;
+  border-radius: 14px;
+  padding: 1rem;
+  background: #fafafa;
+  max-height: 650px;
+  overflow: auto;
+
+  pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: inherit;
+    line-height: 1.6;
+  }
+}
+
+@media (max-width: 980px) {
+  .creator-page__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .creator-output {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .creator-page {
+    padding: 1rem;
+  }
+
+  .creator-row {
+    grid-template-columns: 1fr;
+  }
+
+  .section-title-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

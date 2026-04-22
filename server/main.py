@@ -1,5 +1,7 @@
+from importlib import import_module
 from pathlib import Path
 from threading import Thread
+
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,38 +11,59 @@ load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
 from routers.auth import router as AuthRouter
 from routers.contact import router as ContactRouter
-from routers.pricing import router as PricingRouter
-from routers.payments import router as PaymentsRouter
 from routers.content import router as ContentRouter
+from routers.payments import router as PaymentsRouter
+from routers.pricing import router as PricingRouter
 from routers.thesis import router as ThesisRouter
 from routers.vapi import router as VapiRouter
 
 from db import Base, SessionLocal, engine
-import models  # noqa: F401  (make sure models are imported so metadata is populated)
+import models  # noqa: F401
+from services.phone_speech_service import normalize_phone_tts_text
 from services.telephony_session_service import telephony_session_service
 from services.thesis_agent_service import thesis_agent_service
-from services.thesis_generation_service import thesis_generation_service
-from services.phone_speech_service import normalize_phone_tts_text
 from services.thesis_voice_service import thesis_voice_service
+
+OPTIONAL_ROUTER_MODULES = [
+    "routers.blog",
+    "routers.dashboard",
+    "routers.ai_cv",
+    "routers.ai_bio",
+    "routers.ai_social",
+    "routers.ai_link",
+    "routers.ai_video",
+    "routers.video_prompt_builder",
+]
 
 app = FastAPI(
     title="MyShortBIZ API",
-    swagger_ui_parameters={"persistAuthorization": True},  # keep token across refreshes
+    swagger_ui_parameters={"persistAuthorization": True},
 )
 
-# Create all tables
 Base.metadata.create_all(bind=engine)
 
-# CORS for frontend
-origins = ["http://localhost:5173"]
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+def _include_optional_router(module_path: str) -> None:
+    try:
+        module = import_module(module_path)
+        router = getattr(module, "router", None)
+        if router is not None:
+            app.include_router(router)
+    except Exception:
+        pass
 
 
 def _prewarm_exact_demo_voice():
@@ -51,7 +74,6 @@ def _prewarm_exact_demo_voice():
         agent_config = context.get("agent_config", {})
         phone_config = context.get("phone_config", {})
         user_id = context.get("user_id")
-        project_id = context.get("thesis_project_id")
         greeting = agent_config.get("greeting_script")
         business_name = agent_config.get("business_name", "MyShortBIZ")
         if prompt_path and user_id:
@@ -72,7 +94,6 @@ def _prewarm_exact_demo_voice():
                     8000,
                     variant=thesis_voice_service.conversation_model_variant,
                 )
-
     except Exception:
         pass
     finally:
@@ -94,8 +115,6 @@ def health():
     return {"status": "ok", "service": "MyShortBIZ"}
 
 
-# ----- Mount Routers -----
-
 app.include_router(AuthRouter)
 app.include_router(ContactRouter)
 app.include_router(PricingRouter)
@@ -103,3 +122,6 @@ app.include_router(PaymentsRouter)
 app.include_router(ContentRouter)
 app.include_router(ThesisRouter)
 app.include_router(VapiRouter)
+
+for module_path in OPTIONAL_ROUTER_MODULES:
+    _include_optional_router(module_path)
