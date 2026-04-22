@@ -6,6 +6,8 @@ MyShortBIZ uses a React/Vite frontend with a FastAPI backend. The current dev wo
 - API on `http://127.0.0.1:8000`
 - local voice daemon on `http://127.0.0.1:8011`
 
+This repo assumes `npm run dev` is the primary local startup path for the full application stack during development.
+
 Run:
 
 ```bash
