@@ -1,5 +1,3 @@
-import React from "react";
-import Sidebar from "./Sidebar.tsx";
 import './style.scss';
 import { Outlet } from "react-router-dom";
 import { Link } from "react-router-dom";

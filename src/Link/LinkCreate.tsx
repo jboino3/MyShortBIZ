@@ -6,39 +6,6 @@ function LinkCreate() {
   const [utmEnabled, setUtmEnabled] = useState(false);
   const [expirationEnabled, setExpirationEnabled] = useState(false);
 
-  const [links, setLinks] = useState<any[]>([]);
-  const [search, setSearch] = useState("");
-  const [filterType, setFilterType] = useState("all");
-
-  const createLink = () => {
-
-  const id = crypto.randomUUID().slice(0,6);
-
-  const newLink = {
-    id,
-    short: `myshort.link/${id}`,
-    original: "https://example.com",
-    created: new Date().toLocaleDateString(),
-    clicks: Math.floor(Math.random()*50),
-    type: "standard"
-  };
-
-  setLinks([newLink, ...links]);
-};
-
-  const filteredLinks = links.filter((link) => {
-
-  const matchesSearch =
-    link.short.toLowerCase().includes(search.toLowerCase()) ||
-    link.original.toLowerCase().includes(search.toLowerCase());
-
-  const matchesFilter =
-    filterType === "all" || link.type === filterType;
-
-  return matchesSearch && matchesFilter;
-
-});
-
   return (
     <main className="link-page-layout">
    

@@ -1,0 +1,221 @@
+.payment-page {
+  min-height: calc(100vh - 72px);
+  padding: 2rem 1rem 3rem;
+  background:
+    radial-gradient(circle at 15% 0%, #e7f2ff 0, transparent 38%),
+    radial-gradient(circle at 90% 18%, #ffe6f2 0, transparent 34%),
+    linear-gradient(135deg, #f8fbff, #f6f3ff);
+}
+
+.payment-shell {
+  max-width: 1080px;
+  margin: 0 auto;
+  display: grid;
+  gap: 1.35rem;
+}
+
+.payment-header {
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(120, 103, 255, 0.18);
+  border-radius: 20px;
+  padding: 1.5rem 1.6rem;
+  box-shadow: 0 10px 28px rgba(20, 26, 58, 0.09);
+
+  .pill {
+    display: inline-block;
+    margin: 0;
+    padding: 0.28rem 0.8rem;
+    border-radius: 999px;
+    background: rgba(120, 103, 255, 0.11);
+    color: #4a3ad6;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    margin: 0.75rem 0 0.55rem;
+    font-size: 2rem;
+    color: #131a33;
+  }
+
+  p {
+    margin: 0;
+    color: #4f5670;
+    line-height: 1.55;
+  }
+}
+
+.subscription-picker {
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(120, 103, 255, 0.16);
+  border-radius: 18px;
+  padding: 1rem 1.15rem;
+  box-shadow: 0 8px 20px rgba(20, 26, 58, 0.08);
+
+  label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #262c44;
+    margin-bottom: 0.4rem;
+  }
+
+  select {
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid #d7dcf7;
+    background: #fff;
+    padding: 0.7rem 0.75rem;
+    font-size: 0.95rem;
+    color: #1d2340;
+  }
+
+  .status,
+  .plan-summary {
+    margin: 0.65rem 0 0;
+    color: #4f5670;
+    font-size: 0.9rem;
+  }
+}
+
+.payment-split {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr 1fr;
+}
+
+.payment-card-panel,
+.payment-btc-panel {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(120, 103, 255, 0.16);
+  border-radius: 18px;
+  padding: 1.2rem;
+  box-shadow: 0 10px 24px rgba(20, 26, 58, 0.09);
+
+  h2 {
+    margin: 0;
+    color: #171d38;
+    font-size: 1.2rem;
+  }
+
+  > p {
+    margin: 0.45rem 0 1rem;
+    color: #535a73;
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+}
+
+.payment-form {
+  display: grid;
+  gap: 0.75rem;
+
+  label {
+    display: grid;
+    gap: 0.35rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #252c45;
+  }
+
+  input {
+    border-radius: 10px;
+    border: 1px solid #d7dcf7;
+    padding: 0.65rem 0.72rem;
+    font-size: 0.94rem;
+    color: #1a213c;
+    background: #fff;
+
+    &:focus {
+      outline: 2px solid rgba(120, 103, 255, 0.25);
+      border-color: #8e80ff;
+    }
+  }
+
+  button {
+    margin-top: 0.2rem;
+    border: 0;
+    border-radius: 999px;
+    padding: 0.72rem 1rem;
+    font-size: 0.94rem;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, #5a4bff, #ff599f);
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 18px rgba(90, 75, 255, 0.3);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.65;
+    }
+  }
+}
+
+.card-fields-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 0.6rem;
+}
+
+.info-note {
+  margin: 0;
+  font-size: 0.83rem;
+  line-height: 1.45;
+  color: #5d6582;
+}
+
+.btc-summary {
+  display: grid;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+
+  p {
+    margin: 0;
+    font-size: 0.92rem;
+    color: #4d5570;
+  }
+}
+
+.btc-button {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.74rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  width: 100%;
+  background: linear-gradient(135deg, #f7931a, #f15c22);
+  cursor: pointer;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+  }
+}
+
+.error {
+  margin: 0.35rem 0 0;
+  color: #c12943;
+  font-size: 0.86rem;
+}
+
+@media (max-width: 900px) {
+  .payment-split {
+    grid-template-columns: 1fr;
+  }
+
+  .card-fields-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .payment-header h1 {
+    font-size: 1.65rem;
+  }
+}

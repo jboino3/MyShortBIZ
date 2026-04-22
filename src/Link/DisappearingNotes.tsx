@@ -59,10 +59,6 @@ const deleteNote = (id: string) => {
   setNotes((prev) => prev.filter((note) => note.id !== id));
 };
 
-  const copyLink = (link: string) => {
-    navigator.clipboard.writeText(link);
-  };
-
   return (
     <main className="link-page-layout">
 

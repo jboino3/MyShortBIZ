@@ -1,4 +1,4 @@
-import React, { FormEvent } from "react";
+import type { FormEvent } from "react";
 import "./styles.scss";
 
 export default function Contact() {

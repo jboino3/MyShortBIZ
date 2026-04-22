@@ -1,6 +1,4 @@
-import React from "react";
 import './style.scss'; // shared styles
-import Sidebar from "./Sidebar.tsx";
 import { Outlet } from "react-router-dom";
 
 function CVLayout() {
