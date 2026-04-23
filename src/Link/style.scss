@@ -1,6 +1,8 @@
-:root {
-  color-scheme: light;
-}
+// :root {
+//   color-scheme: light;
+// }
+h1{
+  color: #000;}
 
 /* Layout.scss */
 .link-layout {
@@ -47,6 +49,8 @@
 
 // Home.tsx Styling
 .create-quick-link-card {
+  
+
   background: #ffffff;
   padding: 1.5rem;
   border: 1px solid #e5e7eb;
@@ -67,6 +71,10 @@
     margin: 0;
     font-size: 1.2rem;
     font-weight: 600;
+  }
+
+  p{
+    color: #000;
   }
 
   /* NEW: style the form */
@@ -119,10 +127,52 @@
       transform: scale(0.98);
     }
   }
+
+  
 }
 
 .recents-section {
   margin-top: 2rem;
+
+  .recent-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.recent-item {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.recent-item:hover {
+  background: #f9fafb;
+}
+
+.short-link {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.short-link:hover {
+  text-decoration: underline;
+}
+
+.original-link {
+  color: #6b7280;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+.original-link:hover {
+  text-decoration: underline;
+}
 }
 
 .recents-card {
@@ -148,6 +198,7 @@
     color: #111827;
   }
 }
+
 
 /****** LinkCreate.tsx styling ******/
 /* ---------------- Layout ---------------- */
@@ -642,7 +693,51 @@
     &:hover {
       background: #4338ca;
     }
+
+    .pagination-controls {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+
+  button {
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    background: white;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
   }
+}
+  }
+}
+
+.links-controls {
+  margin-bottom: 1rem;
+  // background-color: white;
+
+  input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+        background: #ffffff;
+    color: #111827;
+
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+
+    &:focus {
+      outline: none; // optional: removes default browser outline
+      border-color: #3b82f6; // optional: gives a nice focus highlight
+    }
+  
+  }
+
+  
 }
 
 
@@ -675,36 +770,18 @@
     }
   }
 
-  /* Chart placeholders */
-  .charts {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
-    gap: 1rem;
-    margin-bottom: 2rem;
-
-    .chart-placeholder {
-      background: #fff;       // White placeholder
-      border-radius: 10px;
-      padding: 1rem;
-      min-height: 150px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-
-      h3 {
-        margin-bottom: 0.5rem;
-        font-size: 1rem;
-        color: #111;
-      }
-
-      .placeholder-bar {
-        height: 100px;
-        background: #eee;      // light gray inside placeholder
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #888;
-        border-radius: 5px;
-      }
+  /* Sort Button */
+  .sort-button {
+    .sort-label{
+      font-weight: bold;
     }
+    select {
+    background: white;
+    color: black;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 0.5rem;
+  }
   }
 
   /* Links Table */
@@ -733,6 +810,26 @@
         background: #f9f9f9; // subtle hover effect
       }
     }
+    
+    .short-link {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+  }
+
+  .short-link:hover {
+    text-decoration: underline;
+    color: #1d4ed8;
+  }
+
+  .original-link {
+    color: #374151; /* darker gray (more black-ish than before) */
+    text-decoration: none;
+  }
+
+  .original-link:hover {
+    text-decoration: underline;
+  }
   }
 }
 

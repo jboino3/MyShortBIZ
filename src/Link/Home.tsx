@@ -1,58 +1,51 @@
 import { useEffect, useState } from "react";
+import { createLink, getMyLinks } from "../api/api";
+import { Link } from "react-router-dom";
+import "./style.scss";
 
-const API_BASE = import.meta.env.VITE_API_BASE;
-import {createLink, getMyLinks } from "../api/api";
+const API_BASE = import.meta.env.VITE_API_URL;
 
 function Home() {
   const [url, setUrl] = useState("");
   const [recentLinks, setRecentLinks] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const fetchRecentLinks = async () =>{
-    try{
+  // Fetch recent links
+  const fetchRecentLinks = async () => {
+    try {
       const data = await getMyLinks();
-      setRecentLinks(data);
+
+      const linksArray =
+        Array.isArray(data)
+          ? data
+          : data.links || data.data || [];
+
+      setRecentLinks(linksArray);
     } catch (err) {
-      console.error("Failed to fetch recent links:", err);
+      console.error(err);
+      setRecentLinks([]);
     }
-  }
+  };
 
-  // Loads page on start
   useEffect(() => {
-  fetchRecentLinks();
-}, []);
+    fetchRecentLinks();
+  }, []);
 
+  // Create short link
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    let cleanUrl = url.trim(); // user inputted url, removing spaces
-
-    // require http or https for valid url
-    if (!cleanUrl.startsWith("http://") && !cleanUrl.startsWith("https://")) {
-      cleanUrl = "https://" + cleanUrl; // auto prepend https if missing
-    }
-
     setLoading(true);
 
-    try{
-      const data = await createLink({
-        original_url: cleanUrl,
-      });
-
-      const newLink={
-        id: data.id,
-        short: data.short_url,
-        original: data.original_url,
-      }
-
-      setRecentLinks((prev) => [newLink, ...prev]); // add new link to top of list
-      setUrl(""); // clear input
+    try {
+      await createLink({ original_url: url });
+      setUrl("");
+      fetchRecentLinks();
     } catch (err) {
-      console.error("Failed to create link:", err);
+      console.error(err);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
     <main className="home-page-layout">
@@ -80,7 +73,7 @@ function Home() {
         </div>
       </section>
 
-      {/* RECENT LINKS */}
+      {/* RECENT LINKS (simple + clean) */}
       <section className="recents-section">
         <div className="recents-card">
           <h2>Recent Links</h2>
@@ -88,17 +81,43 @@ function Home() {
           {recentLinks.length === 0 ? (
             <p>No links yet.</p>
           ) : (
-            <ul>
-              {Array.isArray(recentLinks) && recentLinks.map((link, index) => (
-                <li key={index}>
-                  <div>
-                    <strong>{link.shortUrl || link.short_code}</strong>
+            <div className="recent-list">
+              {recentLinks.slice(0, 5).map((link) => {
+                const shortUrl = `${API_BASE}/r/${link.short_code}`;
+
+                return (
+                  <div key={link.id} className="recent-item">
+
+                    {/* Short link */}
+                    <a
+                      href={shortUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="short-link"
+                    >
+                      {shortUrl}
+                    </a>
+
+                    {/* Original link */}
+                    <a
+                      href={link.original_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="original-link"
+                    >
+                      {link.original_url}
+                    </a>
+
                   </div>
-                  <div>{link.originalUrl || link.url}</div>
-                </li>
-              ))}
-            </ul>
+                );
+              })}
+            </div>
           )}
+
+          {/* Optional: View all */}
+          <div style={{ marginTop: "1rem" }}>
+            <Link to="/link/links">View all links →</Link>
+          </div>
         </div>
       </section>
     </main>
