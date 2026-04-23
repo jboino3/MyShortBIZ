@@ -26,7 +26,7 @@ function LinkCreate() {
   try {
     const cleanUrl = url.trim();
 
-    // ✅ IMPORTANT VALIDATION
+    // IMPORTANT VALIDATION
     if (!cleanUrl.startsWith("http://") && !cleanUrl.startsWith("https://")) {
       throw new Error("URL must start with http:// or https://");
     }
@@ -140,17 +140,6 @@ function LinkCreate() {
                   onChange={() => setSlugOption("auto")}
                 />
                 Automatically generate (free)
-              </label>
-
-              <label className="radio-option">
-                <input
-                  type="radio"
-                  name="slug"
-                  value="ai"
-                  checked={slugOption === "ai"}
-                  onChange={() => setSlugOption("ai")}
-                />
-                Generate with AI (1 token)
               </label>
 
               <label className="radio-option">

@@ -202,7 +202,6 @@ h1{
 
 /****** LinkCreate.tsx styling ******/
 /* ---------------- Layout ---------------- */
-
 .create-link-main {
   flex: 1;
   padding: 48px 40px;
@@ -250,6 +249,13 @@ h1{
   border-radius: 12px;
   padding: 28px;
   transition: box-shadow 0.2s ease;
+
+  h2{
+    color:black;
+  }
+  label{
+    color:#424242
+  }
 }
 
 .form-card:hover {
@@ -278,6 +284,10 @@ h1{
   display: flex;
   flex-direction: column;
   gap: 14px;
+
+  span{
+    color:#424242
+  }
 }
 
 /* ---------------- Inputs ---------------- */
@@ -285,6 +295,10 @@ h1{
 .form-label {
   font-size: 14px;
   font-weight: 600;
+  color:#424242;
+  .card-title{
+    color:black;
+  }
 }
 
 
@@ -312,18 +326,31 @@ h1{
 
 /* ---------------- Radio + Toggle ---------------- */
 
-.radio-option {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.radio-option input[type="radio"] {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ccc;
+  border-radius: 50%;
+  background: white;
+  display: inline-block;
+  position: relative;
   cursor: pointer;
-  font-size: 14px;
 }
 
-.radio-option input[type="radio"] {
-  accent-color: #6366f1;   // blue when selected
-  background-color: #ffffff; // ensure white background
-  cursor: pointer;
+.radio-option input[type="radio"]:checked {
+  border-color: #6366f1;
+}
+
+.radio-option input[type="radio"]:checked::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 8px;
+  height: 8px;
+  background: #7375f6;
+  border-radius: 50%;
 }
 
 .toggle-switch {
