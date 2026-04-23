@@ -26,6 +26,13 @@ export default function Blog() {
     if (keywords.length < MAX_KEYWORDS) setKeywords([...keywords, '']); 
   };
 
+  const removeKeywordField = (index: number) => {
+  if (keywords.length > 1) { // Always keep at least one field
+    const newKeywords = keywords.filter((_, i) => i !== index);
+    setKeywords(newKeywords);
+  }
+};
+
   const handleKeywordChange = (index: number, value: string) => {
     const newKeywords = [...keywords];
     newKeywords[index] = value;
@@ -34,16 +41,15 @@ export default function Blog() {
 
   // --- BACKEND LOGIC ---
   const [refinementText, setRefinementText] = useState("");
+  const [wordCount, setWordCount] = useState("500");
   const handleFinalizeAI = async () => {
   setLoading(true);
   const token = localStorage.getItem('myshortbiz_token');
 
-  const [wordCount, setWordCount] = useState("500");
-
   // map frontend
   const payload = {
     topic: topic,
-    description: description,
+    description: description + ". Additional user instructions: " + refinementText,
     seo_keyword: keywords[0] || "",
     all_keywords: keywords.filter(k => k.trim()), // use all keywords
     audience: "General Business",
@@ -150,16 +156,22 @@ export default function Blog() {
                 {keywords.map((word, index) => (
                   <div className="keyword-row" key={index}>
                     <input type="text" placeholder="add a keyword..." value={word} onChange={(e) => handleKeywordChange(index, e.target.value)} />
+                    <div className="keyword-actions">
+                    {index > 0 && (
+                      <button className="remove-key-btn" onClick={() => removeKeywordField(index)}>×</button>
+                    )}
+                    
                     {index === keywords.length - 1 && keywords.length < MAX_KEYWORDS && (
-                      <button className="add-key-btn" onClick={addKeywordField} title="Add Keyword">+</button>
+                      <button className="add-key-btn" onClick={addKeywordField}>+</button>
                     )}
                   </div>
+                </div>
                 ))}
               </div>
               
               {/* 3, 4, 5 (Original) */}
               <div className="input-group"><label>3. Description</label> <input type="text" placeholder="Write a sentence or two about the blog topic" value={description} onChange={(e) => setDescription(e.target.value)}/></div>
-              <div className="input-group"><label>4. Source Link</label><input type="text" /></div>
+              <div className="input-group"><label>4. Source Link (Optional)</label> <input type="text" placeholder="Attach a link!"/></div>
               <div className="input-group">
                 <label>5. Target Word Count</label>
                 <select className="custom-select">
@@ -270,6 +282,10 @@ export default function Blog() {
     if (line.startsWith('## ')) {
       return <h2 key={i}>{line.replace('## ', '')}</h2>;
     }
+    // converts '###' into <h3>
+    if (line.startsWith('### ')) {
+    return <h3 key={i} className="content-h3">{line.replace('### ', '')}</h3>;
+    }
     // converts '- ' or '* ' into <li>
     if (line.startsWith('- ') || line.startsWith('* ')) {
       return <li key={i}>{line.replace(/^[*-]\s/, '')}</li>;
@@ -301,7 +317,7 @@ export default function Blog() {
             <section className="refinement-panel">
               <div className="refinement-card card">
                 <div className="card-header"><h4>Step 2: Edit Your Prompt!</h4></div>
-                <textarea className="refine-input" placeholder="e.g. focus more on something..."></textarea>
+                <textarea className="refine-input" placeholder="e.g. Focus the blog more on something.." value={refinementText} onChange={(e) => setRefinementText(e.target.value)}></textarea>
                 <button className="btn btn--primary finalize-btn" onClick={handleFinalizeAI}>
                   {loading ? "Writing Post..." : "Confirm & Edit Prompt"}
                 </button>

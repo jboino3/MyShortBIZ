@@ -2,20 +2,28 @@
 
 .blog-layout.review-active {
   .blog-grid {
-    max-width: 1600px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 20px;
+    max-width: 1800px;
+    padding: 20px;
   }
 }
 
 .control-panel.summary-mode {
+  flex: 0 0 280px;
+  width: 280px;
+  padding: 20px;
   width: 300px;
   min-width: 300px;
-  height: fit-content; // This stops the container from stretching to the bottom
-  align-self: flex-start; // Keeps it anchored to the top
+  height: fit-content;
+  align-self: flex-start;
   padding: 24px;
-  border-radius: 24px; // Smoother bubble look
+  border-radius: 24px; // fixed the look
   background: #ffffff;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  pointer-events: auto; // Ensures the Edit button works
+  pointer-events: auto; // connected to back-end, fixed button
 }
 
 .summary-bubble {
@@ -31,7 +39,7 @@
       font-size: 0.7rem;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: #7a3cff; // Brand purple
+      color: #7a3cff;
       font-weight: 700;
     }
 
@@ -61,7 +69,7 @@
       .value {
         font-size: 1rem;
         font-weight: 500;
-        color: #213547; // Team's dark text color
+        color: #213547; // dark color
         margin: 0;
       }
     }
@@ -73,20 +81,17 @@
       margin-top: 4px;
 
       .pill-tag {
-        background: #f8faff; // Soft blue/purple tint
-        color: #7a3cff; // Team purple text
-        padding: 4px 12px;
-        border-radius: 100px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        border: 1px solid rgba(122, 60, 255, 0.1);
-      }
+    background: #f3ebff;
+    color: #7a3cff;
+    padding: 2px 10px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
     }
   }
 }
 
-// Wrapper for the two right panels
 .workspace-wrapper {
   display: flex;
   flex: 1;
@@ -94,105 +99,78 @@
   overflow: hidden;
 
   .central-preview {
-    flex: 1.5; // Keeps preview size consistent/dominant
+    flex: 1.5;
     min-width: 600px;
+    max-width: 1000px;
   }
 }
 
 // tried to match to cowboy website I guess
 .refinement-panel {
-  flex: 1;
-  animation: slideInRight 0.5s ease forwards;
+  flex: 0 0 340px;
+  animation: slideInRight 0.5s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+  padding: 15px;
+  overflow: visible !important;
 
   .refinement-card {
-    background: #fff;
-    border: 1px solid #eee;
-    border-radius: 20px;
+    background: linear-gradient(180deg, #ffffff 0%, #f9f7ff 100%);
+    border: 1px solid rgba(122, 60, 255, 0.1);
+    border-radius: 24px;
     padding: 32px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
     display: flex;
     flex-direction: column;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-
-    &:hover { 
-      transform: none !important; 
-      border-color: #7a3cff;
-      box-shadow: 0 8px 16px rgba(122, 60, 255, 0.1);
-    }
-
+    gap: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.04);
+    
     .card-header {
-      margin-bottom: 12px;
-      .eyebrow {
-        font-size: 0.65rem;
-        color: #7a3cff;
-        font-weight: 800;
-        text-transform: uppercase;
-        display: block;
-        margin-bottom: 8px;
-      }
-      h4 { margin: 0; font-size: 1.3rem; font-weight: 700; color: #213547; }
+    margin-bottom: 0;
+    border: none;
+    
+    h4 {
+      margin: 0;
+      font-size: 1.4rem;
+      background: linear-gradient(135deg, #213547 0%, #7a3cff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
-
-    .description { font-size: 0.9rem; color: #666; margin-bottom: 20px; }
+    
+    border-bottom: 1px solid rgba(122, 60, 255, 0.05); 
+    padding-bottom: 16px;
+  }
 
     .refine-input {
       width: 100%;
-      height: 140px;
-      border: 1px solid #eee;
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 24px;
-      font-family: inherit;
-      background: #fafafa;
-      color: #333; // text visible Nice
+      height: 220px !important;
+      border: 1.5px solid #f0f0f0;
+      border-radius: 18px;
+      padding: 18px;
+      background: #ffffff;
       resize: none;
+      
+      font-size: 1rem;
+      line-height: 1.5;
       transition: all 0.3s ease;
 
       &:focus {
         border-color: #7a3cff;
-        background: #fff;
-        box-shadow: 0 0 0 4px rgba(122, 60, 255, 0.1);
-        outline: none;
-      }
-
-      &::placeholder { color: #aaa; }
-    }
-
-    .example-list {
-      margin-bottom: 32px;
-      .section-label { font-size: 0.75rem; color: #999; margin-bottom: 12px; }
-      
-      .example-chip {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-        padding: 12px 16px;
-        margin-bottom: 10px;
-        background: #f8faff;
-        border: 1px solid rgba(122, 60, 255, 0.1);
-        border-radius: 10px;
-        font-size: 0.85rem;
-        color: #7a3cff; // for now purple text suggestions
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s ease;
-
-        &:hover {
-          background: #7a3cff;
-          color: #fff;
-          .plus { color: #fff; }
-        }
-
-        .plus { color: #7a3cff; font-weight: 700; font-size: 1.1rem; }
+        box-shadow: 0 8px 20px rgba(122, 60, 255, 0.1);
       }
     }
 
     .finalize-btn {
-      margin-top: auto;
-      padding: 16px;
-      background: #7a3cff;
-      &:hover { background: #6025e0; }
+      margin-top: 10px;
+      padding: 18px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #7a3cff 0%, #6025e0 100%);
+      border-radius: 14px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      box-shadow: 0 4px 15px rgba(122, 60, 255, 0.25);
+      
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(122, 60, 255, 0.35);
+      }
     }
   }
 }
@@ -232,25 +210,26 @@ font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
 
   .control-panel {
   width: 40%;
-  padding: 32px;
-  background: #fff;
-  border-radius: 20px;
-  border: 1px solid #eee;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease; 
+  padding: 40px;
+  background: #ffffff;
+  border-radius: 28px;
+  border: 1px solid rgba(121, 59, 255, 0.08); // border tint
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
 
   h2 {
-      margin-top: 0;
-      margin-bottom: 24px;
-      font-size: 1.8rem; // scaling
+    margin-top: 0;
+    margin-bottom: 32px;
+    font-size: 2rem;
+    background: linear-gradient(135deg, #362147 0%, #7a3cff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 
   &:hover { 
-    transform: none !important;  
-    border-color: #7a3cff;
-    box-shadow: 0 8px 16px rgba(122, 60, 255, 0.1);
+    border-color: rgba(122, 60, 255, 0.3);
+    box-shadow: 0 15px 30px rgba(122, 60, 255, 0.08);
   }
-
-  &.summary-mode { width: 280px; }
 }
 
   .custom-select {
@@ -267,28 +246,30 @@ font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
 
   .input-group {
     margin-bottom: 20px;
-    label { display: block; font-weight: 600; margin-bottom: 8px; color: #444; }
+    label { display: block; font-weight: 600; margin-bottom: 8px; color: #444444; }
     
-    input, select {
-      width: 100%;
-      padding: 12px 16px;
-      border: 1px solid #eee;
-      border-radius: 12px !important;
-      background: #fafafa;
-      font-size: 0.95rem;
+    input, select, .custom-select {
+    width: 100%;
+    padding: 14px 18px;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px !important;
+    background: #fcfcfc;
+    font-size: 0.95rem;
+    color: #213547 !important;
+    transition: all 0.3s ease;
 
-      color: #333 !important; //fixes invisible text
+    &:focus { 
       outline: none !important;
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      border-color: #7a3cff; 
+      background: #fff; 
+      box-shadow: 0 0 0 4px rgba(122, 60, 255, 0.1); 
+      transform: translateY(-1px);
+  }
 
-      &:focus { border-color: #7a3cff; background: #fff; box-shadow: 0 0 0 3px rgba(122, 60, 255, 0.1); 
-      }
-
-      &::placeholder {
-        color: #aaaaaade; 
-        transition: color 0.2s ease;
-      }
-    }
+  &::placeholder {
+    color: #bbb; 
+  }
+}
 
     .cost-notice { font-size: 0.75rem; color: #888; display: block; margin-top: 4px; }
   }
@@ -300,46 +281,72 @@ font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   width: 100%;
 
   .keyword-row {
-    position: relative;
-    display: flex;
+    display: flex !important; // force buttons sidebyside
+    gap: 10px;
     align-items: center;
     width: 100%;
 
     input {
-      width: 100%;
-      padding-right: 45px; // fix space
+      flex: 1;
+      padding-right: 16px !important;
     }
 
-    .add-key-btn {
-      position: absolute;
-      right: 10px;
-      background: #eeeeee;
-      border: none;
-      color: #888;
-      width: 26px;
-      height: 26px;
-      border-radius: 8px;
+    .keyword-actions {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      padding: 0;
-
-      &:hover {
-        background: #7a3cff; // purple on hover, same as other side
-        color: white;
-      }
-
-      svg {
-        width: 14px;
-        height: 14px;
-        stroke-width: 3px;
-      }
+      gap: 6px;
+      flex-shrink: 0; // prevents buttons from overlap
     }
   }
-} 
+}
 
+/* Unified Button Style */
+.add-key-btn, .remove-key-btn {
+  height: 32px;
+  width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); 
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.add-key-btn {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7a3cff 100%);
+  color: white;
+  box-shadow: 0 4px 10px rgba(122, 60, 255, 0.2);
+
+  &:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 15px rgba(122, 60, 255, 0.35);
+    filter: brightness(1.1);
+  }
+  
+  &:active {
+    transform: translateY(0) scale(0.95);
+  }
+}
+
+.remove-key-btn {
+  background: #ffffff;
+  color: #ff4d4f;
+  border: 1px solid #ffccc7;
+
+  &:hover {
+    background: #fff1f0;
+    border-color: #ff4d4f;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    background: #ff4d4f;
+    color: white;
+    transform: scale(0.95);
+  }
+}
 
  .content-style-section {
   display: flex;
@@ -359,6 +366,7 @@ font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
     gap: 10px;
     width: 100%; // need 100% so doesnt shrink/text wrap
   }
+
 
   .chip-item {
     cursor: pointer;
@@ -459,7 +467,8 @@ font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
 
     .preview-box {
   background: #fff;
-  height: 600px;
+  height: 75vh;
+  min-height: 650px;
   border-radius: 24px;
   border: 1px solid #eee;
   transition: all 0.4s ease;
@@ -467,12 +476,12 @@ font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   position: relative;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
 
-  // Initial State: Waiting for user
+  // initial state
   &.waiting-state {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #fafafa; // Slightly darker to show it's "empty"
+    background: #fafafa; // empty state
     
     .waiting-text {
       text-align: center;
@@ -489,7 +498,7 @@ font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
     }
   }
 
-  // Active State: AI Content is present
+  // active state (when generated)
   &.has-content {
     background: #ffffff;
     padding: 40px;
@@ -508,17 +517,26 @@ font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
     color: #1a1a1a;
     margin-bottom: 30px;
     letter-spacing: -0.02em;
-    border-bottom: 2px solid #f3ebff; // Subtle purple accent
+    border-bottom: 2px solid #f3ebff;
     padding-bottom: 15px;
   }
 
   h2 {
     font-size: 1.7rem;
     font-weight: 700;
-    color: #7a3cff; // Your brand purple
+    color: #7a3cff;
     margin-top: 40px;
     margin-bottom: 16px;
   }
+
+  h3.content-h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #333;
+  margin-top: 24px;
+  margin-bottom: 8px;
+  display: block;
+}
 
   p {
     margin-bottom: 20px;
@@ -532,7 +550,7 @@ font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
     list-style: none;
 
     &::before {
-      content: "→"; // Custom bullet
+      content: "→"; // custom
       color: #7a3cff;
       position: absolute;
       left: 0;
@@ -554,4 +572,19 @@ font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   }
 }
   }
+}
+
+.waiting-text {
+  animation: pulseFade 3s infinite ease-in-out;
+  
+  p {
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 1.1rem !important;
+  }
+}
+
+@keyframes pulseFade {
+  0%, 100% { opacity: 0.6; transform: scale(0.98); }
+  50% { opacity: 1; transform: scale(1); }
 }
