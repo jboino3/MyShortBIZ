@@ -40,22 +40,54 @@ export default function Blog() {
   };
 
   // --- BACKEND LOGIC ---
+  const [userBlogs, setUserBlogs] = useState([]);
+  const [currentBlogId, setCurrentBlogId] = useState<number | null>(null);
   const [refinementText, setRefinementText] = useState("");
   const [wordCount, setWordCount] = useState("500");
+
+  const fetchHistory = async () => {
+    const token = localStorage.getItem('token');
+    console.log("Current Token:", token);
+    if (!token) return;
+
+    try {
+      const response = await fetch("http://localhost:8000/api/blog/my", {
+        method: "GET",
+        headers: { 
+          "Authorization": `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const history = await response.json();
+        console.log("Successfully fetched history:", history);
+        setUserBlogs(history); // update please
+      }
+    } catch (err) {
+      console.error("History fetch failed:", err);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchHistory();
+  }, []);
+
   const handleFinalizeAI = async () => {
   setLoading(true);
   const token = localStorage.getItem('myshortbiz_token');
 
   // map frontend
   const payload = {
-    topic: topic,
-    description: description + ". Additional user instructions: " + refinementText,
+    topic: topic || "",
+    description: description || "",
     seo_keyword: keywords[0] || "",
     all_keywords: keywords.filter(k => k.trim()), // use all keywords
     audience: "General Business",
     tone: "Professional",
-    word_count: parseInt(wordCount), 
-    features: features
+    word_count: parseInt(wordCount) || 300, 
+    features: features,
+    existing_content: generatedContent,
+    refinement_instruction: refinementText
   };
 
   try {
@@ -69,25 +101,46 @@ export default function Blog() {
     });
     
     const data = await response.json();
-    
-    // Update the UI with the Markdown returned by generate_blog_markdown
+    setGeneratedContent(data.content_markdown || data.content);
+    setCurrentBlogId(data.blog_id);
+    await fetchHistory();
+
+
+    //updated ui
     setGeneratedContent(data.content_markdown || data.content);
   } catch (err) {
     setGeneratedContent("Connection failed. Ensure the server is running!");
   } finally {
     setLoading(false);
   }
+
+  await fetchHistory();
 };
+
+  const loadSpecificBlog = async (id: number) => {
+    setLoading(true);
+    const token = localStorage.getItem('token');
+      try {
+        const response = await fetch(`http://localhost:8000/api/blog/${id}`, {
+          headers: { "Authorization": `Bearer ${token}` }
+      });
+    const data = await response.json();
+      setGeneratedContent(data.content_markdown);
+      setIsReviewMode(true); 
+    } finally {
+    setLoading(false);
+    }
+  };
 
   const handleGeneratePrompt = async () => {
   setIsReviewMode(true); // review mode
-  setLoading(true);      // ai is thinking...
+  setLoading(true); // 'ai is thinking' text
   
-  const token = localStorage.getItem('myshortbiz_token');
+  const token = localStorage.getItem('token');
 
   // maps steps
   const payload = {
-    topic: topic,
+    topic: topic || "",
     seo_keyword: keywords[0] || "",
     all_keywords: keywords.filter(k => k.trim()), // sends all keywords
     description: description,
@@ -95,10 +148,10 @@ export default function Blog() {
     tone: "Professional",
     word_count: 300, 
     features: {
-      bullets: false,
-      qa: false,
-      meta_description: false
-    }
+    bullets: features.bullets,
+    qa: features.qa,
+    meta_description: features.meta_description
+  }
   };
 
   try {
@@ -144,13 +197,13 @@ export default function Blog() {
           
           {!isReviewMode ? (
             <>
-              {/* 1. Topic (Original) */}
+              {/* 1. Topic */}
               <div className="input-group">
                 <label>1. Topic</label>
                 <input type="text" value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="example: write a post..." />
               </div>
 
-              {/* 2. Keywords (Original) */}
+              {/* 2. Keywords */}
               <div className="input-group keyword-section">
                 <label className="section-label">2. Keywords</label>
                 {keywords.map((word, index) => (
@@ -169,12 +222,12 @@ export default function Blog() {
                 ))}
               </div>
               
-              {/* 3, 4, 5 (Original) */}
+              {/* 3, 4, 5 */}
               <div className="input-group"><label>3. Description</label> <input type="text" placeholder="Write a sentence or two about the blog topic" value={description} onChange={(e) => setDescription(e.target.value)}/></div>
               <div className="input-group"><label>4. Source Link (Optional)</label> <input type="text" placeholder="Attach a link!"/></div>
               <div className="input-group">
                 <label>5. Target Word Count</label>
-                <select className="custom-select">
+                <select className="custom-select" value={wordCount} onChange={(e) => setWordCount(e.target.value)}>
                   <option value="150">Small (10-150 words)</option>
                   <option value="500">Medium (150-500 words)</option>
                   <option value="1000">Large (500+ words)</option>
@@ -182,7 +235,7 @@ export default function Blog() {
               <small className="cost-notice">Note: larger posts will cost more tokens.</small>
               </div>
 
-              {/* 6. Content Styles (Original Chips) */}
+              {/* 6. Content Styles */}
               <div className="input-group content-style-section">
   <label className="section-label">6. Additional Content Styles</label>
   <div className="checkbox-grid">
@@ -234,7 +287,11 @@ export default function Blog() {
     <div className="meta-grid">
       <div className="summary-row">
         <span className="label">Target Length</span>
-        <p className="value small-text">Medium (150-500 words)</p>
+        <p className="value small-text">
+          {wordCount === "150" && "Small (10-150 words)"}
+          {wordCount === "500" && "Medium (150-500 words)"}
+          {wordCount === "1000" && "Large (500+ words)"}  
+        </p>
       </div>
     </div>
 
@@ -246,10 +303,38 @@ export default function Blog() {
           .map(([name]) => (
         <span key={name} className="pill-tag small">{name.replace('_', ' ')}</span>
       ))}
-    {/* If nothing is selected, show a placeholder */}
+    {/* if nothing is selected, placeholder */}
     {!Object.values(features).some(v => v) && <p className="value small-text">None</p>}
   </div>
 </div>
+
+        {true && (
+    <div className="summary-row history-section" style={{ marginTop: '20px', borderTop: '1px solid #f0f0f0', paddingTop: '15px' }}>
+      <span className="label">Recent Blogs</span>
+      <div className="history-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '10px' }}>
+        {userBlogs.slice(0, 5).map((blog: any) => (
+          <button 
+            key={blog.blog_id} 
+            className="history-item-btn"
+            onClick={() => loadSpecificBlog(blog.blog_id)}
+            style={{
+              textAlign: 'left',
+              background: '#f9f7ff',
+              border: '1px solid #eee',
+              padding: '8px 12px',
+              borderRadius: '10px',
+              fontSize: '0.85rem',
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+          >
+            {blog.title || `Blog #${blog.blog_id}`}
+          </button>
+        ))}
+      </div>
+    </div>
+  )}
+
   </div>
             </div>
           )}
@@ -298,7 +383,7 @@ export default function Blog() {
           }} />
         );
     }
-    // Standard paragraph
+    // paragraph
     return line.trim() === "" ? <br key={i} /> : <p key={i}>{line}</p>;
   })}
 </div>

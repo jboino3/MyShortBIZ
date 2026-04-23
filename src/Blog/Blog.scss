@@ -584,6 +584,18 @@ font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   }
 }
 
+.history-item-btn {
+  color: #213547;
+  font-weight: 500;
+  
+  &:hover {
+    background: #7a3cff !important;
+    color: white !important;
+    border-color: #7a3cff !important;
+    transform: translateX(4px);
+  }
+}
+
 @keyframes pulseFade {
   0%, 100% { opacity: 0.6; transform: scale(0.98); }
   50% { opacity: 1; transform: scale(1); }

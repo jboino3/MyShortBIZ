@@ -9,7 +9,7 @@ import CVBuilder from "./CV/CVBuilder";
 import CVLayout from "./CV/CVLayout";
 import CVPage from "./CV/CVPage";
 import CVPortfolio from "./CV/CVPortfolio";
-import Bio from "./CreatorHome/Bio";
+import Bio from "./Bio/Bio";
 import Blog from "./Blog/Blog";
 import CreatorHome from "./CreatorHome/CreatorHome";
 import Settings from "./CreatorHome/Settings";
